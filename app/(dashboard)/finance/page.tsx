@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { KpiCard } from "@/components/kpi-card"
-import { TrendChart } from "@/components/trend-chart"
+import { CashForecastChart } from "@/components/cash-forecast-chart"
+import { BurnBreakdownChart } from "@/components/burn-breakdown-chart"
 import { InsightsPanel } from "@/components/insights-panel"
 import { KpiDefinitionsDrawer } from "@/components/kpi-definitions-drawer"
 import { ScenarioPlanner } from "@/components/scenario-planner"
@@ -21,8 +22,8 @@ import {
   forecastScenarios,
   budgetItems,
   monthEndTasks,
-  cashTrendData,
-  burnTrendData,
+  cashForecastData,
+  burnBreakdownData,
 } from "@/data/mock"
 import { KPI } from "@/data/types"
 import { CheckCircle2, Circle, Clock } from "lucide-react"
@@ -34,12 +35,16 @@ export default function FinancePage() {
     ["Cash Balance", "Monthly Burn", "Runway"].includes(kpi.name)
   )
 
+  // Calculate minimum buffer (2.5 months of burn)
+  const monthlyBurn = 285000
+  const minimumBuffer = monthlyBurn * 2.5
+
   const insights = [
-    "Runway at 8.4 months requires immediate action - target is 12+ months for healthy operations",
-    "Marketing overspend of $7k (15.6%) is primary driver of elevated burn rate",
-    "Engineering spend up 4.2% but within acceptable variance given hiring plans",
-    "Infrastructure savings of $1.5k from recent vendor optimization should continue",
-    "Month-end close on track - 2 of 5 tasks completed, 3 pending by Jan 31",
+    "Cash forecast shows critical period in late March: balance dips to $2.18M before Q1 renewals arrive. Ensure renewal pipeline is secured.",
+    "Marketing is largest burn driver at $52k/mo (18% of total), up 15.6% over budget. Engineering at $125k (44%) is largest absolute spend but within plan variance.",
+    "Scenario analysis shows Bear case extends runway to 11.2 months (+2.8mo) vs Bull case at 6.9mo (-1.5mo). Current trajectory requires action: runway at 8.4mo is below 9mo minimum.",
+    "Budget variance driven by Marketing overspend ($7k) offset partially by Sales underspend (-$4k) and Infrastructure savings (-$1.5k). Net: +$10.5k/mo over budget.",
+    "One-off events ahead: Partnership payment ($180k) in Feb, Q1 renewals ($175k) in March will stabilize cash. Plan hiring start (Mar 30) only after renewals confirmed.",
   ]
 
   const taskStatusConfig = {
@@ -67,23 +72,14 @@ export default function FinancePage() {
         </div>
       </div>
 
-      {/* Trend Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TrendChart
-          title="Cash Balance Over Time"
-          data={cashTrendData}
-          type="area"
-          color="#E56B4E"
-          formatValue={(value) => `$${(value / 1000).toFixed(0)}k`}
-        />
-        <TrendChart
-          title="Monthly Burn"
-          data={burnTrendData}
-          type="bar"
-          color="#D45A3E"
-          formatValue={(value) => `$${(value / 1000).toFixed(0)}k`}
-        />
-      </div>
+      {/* Advanced Charts */}
+      <CashForecastChart
+        data={cashForecastData}
+        minimumBuffer={minimumBuffer}
+        monthlyBurn={monthlyBurn}
+      />
+
+      <BurnBreakdownChart data={burnBreakdownData} />
 
       {/* Budget vs Actuals */}
       <Card>

@@ -5,15 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ForecastScenario } from "@/data/types"
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2 } from "lucide-react"
 
 interface ScenarioPlannerProps {
   scenarios: ForecastScenario[]
 }
 
 export function ScenarioPlanner({ scenarios }: ScenarioPlannerProps) {
-  const [selectedScenario, setSelectedScenario] = useState<ForecastScenario>(
-    scenarios.find((s) => s.name === "Base") || scenarios[0]
-  )
+  const baseScenario = scenarios.find((s) => s.name === "Base")!
+  const [selectedScenario, setSelectedScenario] = useState<ForecastScenario>(baseScenario)
 
   const [assumptions, setAssumptions] = useState(selectedScenario.assumptions)
 
@@ -41,15 +41,51 @@ export function ScenarioPlanner({ scenarios }: ScenarioPlannerProps) {
   }
 
   const outputs = calculateOutputs(assumptions)
+  const baseOutputs = baseScenario.outputs
+
+  // Calculate deltas vs base case
+  const burnDelta = outputs.burn - baseOutputs.burn
+  const runwayDelta = outputs.runwayMonths - baseOutputs.runwayMonths
+  const mrrDelta = outputs.mrr - baseOutputs.mrr
+
+  const formatDelta = (value: number, prefix = "$", suffix = "") => {
+    const sign = value > 0 ? "+" : ""
+    return `${sign}${prefix}${value.toLocaleString()}${suffix}`
+  }
 
   const handleAssumptionChange = (key: keyof typeof assumptions, value: number) => {
     setAssumptions((prev) => ({ ...prev, [key]: value }))
   }
 
+  // Generate insights based on scenario
+  const getScenarioInsights = () => {
+    const insights = []
+
+    if (selectedScenario.name === "Bear") {
+      insights.push("Conservative scenario: Minimal hiring, reduced marketing spend")
+      insights.push("Extends runway to 11.2 months by cutting costs")
+      insights.push("Risk: Lower MRR growth may miss revenue targets")
+    } else if (selectedScenario.name === "Bull") {
+      insights.push("Aggressive scenario: Accelerated hiring, increased marketing")
+      insights.push("Prioritizes growth over runway (6.9 months)")
+      insights.push("Risk: Requires fundraising or revenue acceleration within 6 months")
+    } else {
+      insights.push("Current trajectory: Moderate hiring, steady marketing")
+      insights.push("Runway at 8.4 months - below 9-month minimum threshold")
+      insights.push("Action needed: Either reduce burn or accelerate revenue")
+    }
+
+    return insights
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Scenario Planner</CardTitle>
+        <CardTitle>Scenario Planning: Compare Financial Tradeoffs</CardTitle>
+        <p className="text-sm text-muted-foreground mt-2">
+          Model how hiring, marketing spend, and churn affect runway and growth.
+          Adjust sliders to see real-time impact vs. base case.
+        </p>
       </CardHeader>
       <CardContent>
         <Tabs
@@ -66,6 +102,9 @@ export function ScenarioPlanner({ scenarios }: ScenarioPlannerProps) {
             {scenarios.map((scenario) => (
               <TabsTrigger key={scenario.id} value={scenario.name}>
                 {scenario.name}
+                {scenario.name === "Base" && (
+                  <Badge variant="outline" className="ml-2 text-xs">Current</Badge>
+                )}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -73,6 +112,15 @@ export function ScenarioPlanner({ scenarios }: ScenarioPlannerProps) {
           {scenarios.map((scenario) => (
             <TabsContent key={scenario.id} value={scenario.name}>
               <div className="space-y-6">
+                {/* Scenario Description */}
+                <div className="bg-accent-2/20 rounded-xl p-4 border border-accent/20">
+                  <h3 className="text-sm font-semibold mb-2">Scenario Overview</h3>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    {getScenarioInsights().map((insight, i) => (
+                      <li key={i}>• {insight}</li>
+                    ))}
+                  </ul>
+                </div>
                 {/* Assumptions */}
                 <div>
                   <h3 className="text-sm font-semibold mb-4">Assumptions</h3>
@@ -139,52 +187,178 @@ export function ScenarioPlanner({ scenarios }: ScenarioPlannerProps) {
                   </div>
                 </div>
 
-                {/* Outputs */}
+                {/* Outputs - Comparison with Base */}
                 <div>
-                  <h3 className="text-sm font-semibold mb-4">Projected Outputs</h3>
+                  <h3 className="text-sm font-semibold mb-4">
+                    Financial Impact vs. Base Case
+                  </h3>
                   <div className="grid grid-cols-3 gap-4">
+                    {/* Monthly Burn */}
                     <div className="bg-muted rounded-xl p-4">
                       <p className="text-sm text-muted-foreground mb-1">
                         Monthly Burn
                       </p>
-                      <p className="text-2xl font-bold">
+                      <p className="text-2xl font-bold mb-1">
                         ${outputs.burn.toLocaleString()}
                       </p>
+                      {selectedScenario.name !== "Base" && (
+                        <div className="flex items-center gap-1 text-sm">
+                          {burnDelta < 0 ? (
+                            <>
+                              <TrendingDown className="h-4 w-4 text-green-600" />
+                              <span className="text-green-600 font-medium">
+                                {formatDelta(burnDelta, "$", "")}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <TrendingUp className="h-4 w-4 text-red-600" />
+                              <span className="text-red-600 font-medium">
+                                {formatDelta(burnDelta, "$", "")}
+                              </span>
+                            </>
+                          )}
+                          <span className="text-muted-foreground text-xs">vs base</span>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Runway */}
                     <div className="bg-muted rounded-xl p-4">
                       <p className="text-sm text-muted-foreground mb-1">Runway</p>
-                      <p className="text-2xl font-bold">
+                      <p className="text-2xl font-bold mb-1">
                         {outputs.runwayMonths} mo
                       </p>
+                      {selectedScenario.name !== "Base" && (
+                        <div className="flex items-center gap-1 text-sm">
+                          {runwayDelta > 0 ? (
+                            <>
+                              <TrendingUp className="h-4 w-4 text-green-600" />
+                              <span className="text-green-600 font-medium">
+                                {formatDelta(runwayDelta, "", " mo")}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <TrendingDown className="h-4 w-4 text-red-600" />
+                              <span className="text-red-600 font-medium">
+                                {formatDelta(runwayDelta, "", " mo")}
+                              </span>
+                            </>
+                          )}
+                          <span className="text-muted-foreground text-xs">vs base</span>
+                        </div>
+                      )}
                     </div>
+
+                    {/* MRR */}
                     <div className="bg-muted rounded-xl p-4">
                       <p className="text-sm text-muted-foreground mb-1">MRR</p>
-                      <p className="text-2xl font-bold">
+                      <p className="text-2xl font-bold mb-1">
                         ${outputs.mrr.toLocaleString()}
                       </p>
+                      {selectedScenario.name !== "Base" && (
+                        <div className="flex items-center gap-1 text-sm">
+                          {mrrDelta > 0 ? (
+                            <>
+                              <TrendingUp className="h-4 w-4 text-green-600" />
+                              <span className="text-green-600 font-medium">
+                                {formatDelta(mrrDelta, "$", "")}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <TrendingDown className="h-4 w-4 text-red-600" />
+                              <span className="text-red-600 font-medium">
+                                {formatDelta(mrrDelta, "$", "")}
+                              </span>
+                            </>
+                          )}
+                          <span className="text-muted-foreground text-xs">vs base</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
-                {/* Impact Analysis */}
+                {/* Decision Guidance */}
                 <div className="bg-accent-2/20 rounded-xl p-4 border border-accent/20">
-                  <h3 className="text-sm font-semibold mb-2">Impact Analysis</h3>
-                  <div className="space-y-1 text-sm text-muted-foreground">
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    {outputs.runwayMonths >= 12 ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    )}
+                    Decision Guidance
+                  </h3>
+                  <div className="space-y-2 text-sm">
                     {outputs.runwayMonths < 9 && (
-                      <p className="text-red-600 font-medium">
-                        ⚠️ Runway below 9 months - critical risk level
-                      </p>
+                      <div className="flex gap-2">
+                        <span className="text-red-600 font-bold">⚠️</span>
+                        <div>
+                          <p className="text-red-600 font-medium">
+                            Critical: Runway below 9 months
+                          </p>
+                          <p className="text-muted-foreground text-xs mt-1">
+                            Immediate action required: Cut costs or secure funding within 60 days
+                          </p>
+                        </div>
+                      </div>
                     )}
                     {outputs.runwayMonths >= 9 && outputs.runwayMonths < 12 && (
-                      <p className="text-yellow-600 font-medium">
-                        ⚠️ Runway below target - moderate risk
-                      </p>
+                      <div className="flex gap-2">
+                        <span className="text-amber-600 font-bold">⚠️</span>
+                        <div>
+                          <p className="text-amber-600 font-medium">
+                            Caution: Runway below 12-month target
+                          </p>
+                          <p className="text-muted-foreground text-xs mt-1">
+                            Plan to improve runway or initiate fundraising conversation
+                          </p>
+                        </div>
+                      </div>
                     )}
                     {outputs.runwayMonths >= 12 && (
-                      <p className="text-green-600 font-medium">
-                        ✓ Runway meets target - healthy position
-                      </p>
+                      <div className="flex gap-2">
+                        <span className="text-green-600 font-bold">✓</span>
+                        <div>
+                          <p className="text-green-600 font-medium">
+                            Healthy: Runway meets 12-month target
+                          </p>
+                          <p className="text-muted-foreground text-xs mt-1">
+                            Good position for growth investments and strategic planning
+                          </p>
+                        </div>
+                      </div>
                     )}
+
+                    {/* Tradeoff analysis */}
+                    <div className="pt-2 mt-2 border-t border-accent/20">
+                      <p className="text-xs font-medium text-foreground mb-1">Key Tradeoffs:</p>
+                      <ul className="text-xs text-muted-foreground space-y-1">
+                        {selectedScenario.name === "Bear" && (
+                          <>
+                            <li>✓ Extends runway significantly (+2.8 mo)</li>
+                            <li>✗ Slower MRR growth (-$14k/mo)</li>
+                            <li>→ Best if: Need to preserve cash, fundraising delayed</li>
+                          </>
+                        )}
+                        {selectedScenario.name === "Bull" && (
+                          <>
+                            <li>✓ Accelerates MRR growth (+$26k/mo)</li>
+                            <li>✗ Burns runway faster (-1.5 mo)</li>
+                            <li>→ Best if: Fundraising secured or revenue milestone critical</li>
+                          </>
+                        )}
+                        {selectedScenario.name === "Base" && (
+                          <>
+                            <li>• Balanced approach: Moderate growth + reasonable runway</li>
+                            <li>• Needs improvement: 8.4 mo runway below 9 mo minimum</li>
+                            <li>→ Action: Slight burn reduction or revenue acceleration needed</li>
+                          </>
+                        )}
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>

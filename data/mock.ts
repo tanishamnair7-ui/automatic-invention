@@ -889,3 +889,97 @@ export const vendorSpendData = vendors
     name: v.name,
     value: v.spendMonthly,
   }))
+
+// Cash forecast with events (actual + forecast)
+export const cashForecastData = [
+  // Historical actual data
+  { date: "Dec 1", actual: 2480000 },
+  { date: "Dec 8", actual: 2450000 },
+  { date: "Dec 15", actual: 2420000, events: ["Annual AWS renewal ($45k)"] },
+  { date: "Dec 22", actual: 2385000 },
+  { date: "Dec 29", actual: 2350000 },
+  { date: "Jan 5", actual: 2320000 },
+  { date: "Jan 12", actual: 2400000, events: ["VAT payment ($75k)", "Large customer payment ($155k)"] },
+
+  // Forecast data (13 weeks)
+  { date: "Jan 19", forecast: 2365000 },
+  { date: "Jan 26", forecast: 2330000 },
+  { date: "Feb 2", forecast: 2290000 },
+  { date: "Feb 9", forecast: 2420000, events: ["Partnership payment ($180k)"] },
+  { date: "Feb 16", forecast: 2380000 },
+  { date: "Feb 23", forecast: 2340000 },
+  { date: "Mar 2", forecast: 2300000 },
+  { date: "Mar 9", forecast: 2260000 },
+  { date: "Mar 16", forecast: 2350000, events: ["Q1 enterprise renewals ($175k)"] },
+  { date: "Mar 23", forecast: 2310000 },
+  { date: "Mar 30", forecast: 2270000, events: ["Planned hiring start - 2 engineers"] },
+  { date: "Apr 6", forecast: 2220000 },
+  { date: "Apr 13", forecast: 2180000 },
+]
+
+// Burn breakdown by category over time
+export const burnBreakdownData = [
+  {
+    month: "Jul",
+    engineering: 95000,
+    marketing: 40000,
+    sales: 30000,
+    customerSuccess: 22000,
+    operations: 20000,
+    infrastructure: 13000,
+  },
+  {
+    month: "Aug",
+    engineering: 98000,
+    marketing: 42000,
+    sales: 28000,
+    customerSuccess: 23000,
+    operations: 21000,
+    infrastructure: 13000,
+  },
+  {
+    month: "Sep",
+    engineering: 105000,
+    marketing: 45000,
+    sales: 32000,
+    customerSuccess: 24000,
+    operations: 21000,
+    infrastructure: 13000,
+  },
+  {
+    month: "Oct",
+    engineering: 115000,
+    marketing: 48000,
+    sales: 33000,
+    customerSuccess: 25000,
+    operations: 20000,
+    infrastructure: 14000,
+  },
+  {
+    month: "Nov",
+    engineering: 120000,
+    marketing: 50000,
+    sales: 34000,
+    customerSuccess: 27000,
+    operations: 24000,
+    infrastructure: 15000,
+  },
+  {
+    month: "Dec",
+    engineering: 122000,
+    marketing: 51000,
+    sales: 32000,
+    customerSuccess: 28000,
+    operations: 30000,
+    infrastructure: 17000,
+  },
+  {
+    month: "Jan",
+    engineering: 125000,
+    marketing: 52000,
+    sales: 31000,
+    customerSuccess: 29500,
+    operations: 31000,
+    infrastructure: 16500,
+  },
+]
