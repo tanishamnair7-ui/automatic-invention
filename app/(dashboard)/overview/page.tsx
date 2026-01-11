@@ -3,24 +3,25 @@
 import { useState } from "react"
 import { KpiCard } from "@/components/kpi-card"
 import { TrendChart } from "@/components/trend-chart"
-import { Alerts } from "@/components/alerts"
+import { HighsAndLows } from "@/components/highs-and-lows"
 import { InsightsPanel } from "@/components/insights-panel"
 import { KpiDefinitionsDrawer } from "@/components/kpi-definitions-drawer"
+import { CashForecastModal } from "@/components/cash-forecast-modal"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
   kpis,
-  alerts,
   initiatives,
   risks,
   deals,
   cashTrendData,
 } from "@/data/mock"
 import { KPI } from "@/data/types"
-import { Clock, AlertTriangle, TrendingUp, Target, DollarSign, Flame } from "lucide-react"
+import { Target, DollarSign, AlertTriangle } from "lucide-react"
 
 export default function OverviewPage() {
   const [selectedKpi, setSelectedKpi] = useState<KPI | null>(null)
+  const [showCashForecast, setShowCashForecast] = useState(false)
 
   // Get the most critical KPIs for the overview
   const overviewKpis = kpis.filter((kpi) =>
@@ -143,6 +144,78 @@ export default function OverviewPage() {
     },
   ]
 
+  // Create Highs & Lows items
+  const churnedAccounts = 127 // Mock data: actual churned accounts
+  const activeCustomers = 2450 // Mock data
+
+  const highsAndLowsItems = [
+    // WINS (Quadrant 1)
+    {
+      id: "win-1",
+      title: "MRR Growth Strong",
+      message: "MRR up 8.3% to $142k - pricing changes showing positive impact on revenue.",
+      type: "win" as const,
+    },
+    {
+      id: "win-2",
+      title: "Partnership Momentum",
+      message: "WellnessCorp deal at 70% probability ($250k value) - final negotiations underway.",
+      type: "win" as const,
+    },
+    {
+      id: "win-3",
+      title: "CSAT Score Improving",
+      message: "Customer satisfaction up to 4.6/5 despite operational challenges - team executing well.",
+      type: "win" as const,
+    },
+
+    // WATCH CLOSELY (Quadrant 2)
+    {
+      id: "watch-1",
+      title: "CAC Increasing",
+      message: "Customer Acquisition Cost up 14% to $285. Review marketing efficiency and channel performance.",
+      type: "watch" as const,
+    },
+    {
+      id: "watch-2",
+      title: "Response Time Degrading",
+      message: "Support response time at 2.4hrs vs 2.0hr target. Ticket volume up 40% - may need additional headcount.",
+      type: "watch" as const,
+    },
+
+    // MONITOR (Quadrant 3)
+    {
+      id: "monitor-1",
+      title: "Burn Rate Above Target",
+      message: "Monthly burn increased to $285k, 14% above target of $250k. Marketing overspend primary driver.",
+      type: "concern" as const,
+    },
+    {
+      id: "monitor-2",
+      title: "Upcoming Renewals With No Follow-Ups",
+      message: "Salesforce renewal in 66 days, Intercom in 50 days - need to initiate renegotiation discussions.",
+      type: "concern" as const,
+    },
+
+    // IMMEDIATE ATTENTION (Quadrant 4)
+    {
+      id: "urgent-1",
+      title: "Runway Below Threshold",
+      message: "Cash runway at 8.4 months, below 9-month minimum. Burn reduction and cash management critical.",
+      type: "urgent" as const,
+      action: {
+        label: "View 13-week cash forecast →",
+        onClick: () => setShowCashForecast(true),
+      },
+    },
+    {
+      id: "urgent-2",
+      title: "Churn Spike Detected",
+      message: `${churnedAccounts} accounts churned this period (${((churnedAccounts / activeCustomers) * 100).toFixed(1)}% churn rate). Review NPS scores for churned accounts. Review renewal pipeline.`,
+      type: "urgent" as const,
+    },
+  ]
+
   const insights = [
     "Runway dropped to 8.4 months - immediate burn reduction required to extend to 12+ months",
     "Churn spiked to 4.2% (40% above target) - retention program launching this week is critical",
@@ -160,8 +233,8 @@ export default function OverviewPage() {
         </p>
       </div>
 
-      {/* Alerts */}
-      <Alerts alerts={alerts} />
+      {/* Highs & Lows */}
+      <HighsAndLows items={highsAndLowsItems} />
 
       {/* KPI Scoreboard */}
       <div>
@@ -275,6 +348,12 @@ export default function OverviewPage() {
         kpi={selectedKpi}
         open={!!selectedKpi}
         onOpenChange={(open) => !open && setSelectedKpi(null)}
+      />
+
+      {/* Cash Forecast Modal */}
+      <CashForecastModal
+        open={showCashForecast}
+        onOpenChange={setShowCashForecast}
       />
     </div>
   )
