@@ -163,6 +163,9 @@ export function CashForecastChart({
                 strokeWidth={3}
                 dot={(props: any) => {
                   const dataPoint = data[props.index]
+                  // Only render dot if actual value exists
+                  if (dataPoint.actual === undefined) return null
+
                   if (dataPoint.events && dataPoint.events.length > 0) {
                     return (
                       <circle
@@ -187,7 +190,12 @@ export function CashForecastChart({
                 stroke="#D45A3E"
                 strokeWidth={2}
                 strokeDasharray="8 4"
-                dot={{ r: 3, fill: "#D45A3E" }}
+                dot={(props: any) => {
+                  const dataPoint = data[props.index]
+                  // Only render dot if forecast value exists
+                  if (dataPoint.forecast === undefined) return null
+                  return <circle cx={props.cx} cy={props.cy} r={3} fill="#D45A3E" />
+                }}
                 connectNulls={false}
               />
             </LineChart>
