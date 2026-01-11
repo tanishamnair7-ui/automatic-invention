@@ -146,7 +146,7 @@ export default function RevenuePage() {
                           ${(deal.dealValue / 1000).toFixed(0)}k
                         </p>
                         <Badge variant="outline" className="text-xs">
-                          {deal.probability}% prob
+                          {Math.round(deal.probability)}% prob
                         </Badge>
                       </div>
                     </div>

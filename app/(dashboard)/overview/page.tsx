@@ -357,7 +357,7 @@ export default function OverviewPage() {
                 <p className="font-semibold mb-1 text-green-900">{topDeal.partnerName}</p>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-green-700">
-                    ${(topDeal.value / 1000).toFixed(0)}k • {topDeal.probability}% prob
+                    ${(topDeal.value / 1000).toFixed(0)}k • {Math.round(topDeal.probability)}% prob
                   </span>
                   <Badge variant="outline" className="text-xs bg-green-100 text-green-700 border-green-200">
                     {topDeal.stage}
