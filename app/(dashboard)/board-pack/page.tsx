@@ -245,10 +245,10 @@ export default function BoardPackPage() {
                     {deal.partnerName}
                   </TableCell>
                   <TableCell className="text-sm">{deal.type}</TableCell>
-                  <TableCell>${deal.value.toLocaleString()}</TableCell>
-                  <TableCell>{deal.probability}%</TableCell>
+                  <TableCell>${Math.round(deal.value).toLocaleString()}</TableCell>
+                  <TableCell>{Math.round(deal.probability)}%</TableCell>
                   <TableCell className="font-semibold">
-                    ${((deal.value * deal.probability) / 100).toLocaleString()}
+                    ${Math.round((deal.value * deal.probability) / 100).toLocaleString()}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{deal.stage}</Badge>

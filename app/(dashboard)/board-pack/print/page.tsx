@@ -223,7 +223,7 @@ export default function BoardPackPrintPage() {
                 </TableCell>
                 <TableCell className="text-sm">{deal.type}</TableCell>
                 <TableCell>${(deal.value / 1000).toFixed(0)}k</TableCell>
-                <TableCell>{deal.probability}%</TableCell>
+                <TableCell>{Math.round(deal.probability)}%</TableCell>
                 <TableCell className="font-semibold">
                   ${((deal.value * deal.probability) / 100 / 1000).toFixed(0)}k
                 </TableCell>
