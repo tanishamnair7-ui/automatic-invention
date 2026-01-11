@@ -57,10 +57,10 @@ export const kpis: KPI[] = [
   {
     id: "kpi-3",
     name: "Runway",
-    value: 8.4,
+    value: 8,
     unit: "months",
     target: 12,
-    trendPct: -15.0,
+    trendPct: -15,
     status: "red",
     owner: "CFO",
     definition: "Months until cash runs out at current burn",
@@ -99,10 +99,10 @@ export const kpis: KPI[] = [
   {
     id: "kpi-6",
     name: "Churn Rate",
-    value: 4.2,
+    value: 4,
     unit: "%",
-    target: 3.0,
-    trendPct: 18.5,
+    target: 3,
+    trendPct: 19,
     status: "red",
     owner: "Head of Customer Success",
     definition: "Monthly customer churn rate",
@@ -157,10 +157,10 @@ export const kpis: KPI[] = [
   {
     id: "kpi-10",
     name: "Response Time",
-    value: 2.4,
+    value: 2,
     unit: "hours",
-    target: 2.0,
-    trendPct: 8.5,
+    target: 2,
+    trendPct: 9,
     status: "yellow",
     owner: "Head of Operations",
     definition: "Average first response time to customer inquiries",
@@ -172,10 +172,10 @@ export const kpis: KPI[] = [
   {
     id: "kpi-11",
     name: "CSAT",
-    value: 4.6,
+    value: 5,
     unit: "/5",
-    target: 4.5,
-    trendPct: 1.2,
+    target: 5,
+    trendPct: 1,
     status: "green",
     owner: "Head of Customer Success",
     definition: "Customer Satisfaction Score",
@@ -850,13 +850,13 @@ export const mrrTrendData: TrendData[] = [
 ]
 
 export const churnTrendData: TrendData[] = [
-  { date: "2025-07", value: 2.8, label: "Jul" },
-  { date: "2025-08", value: 3.1, label: "Aug" },
-  { date: "2025-09", value: 2.9, label: "Sep" },
-  { date: "2025-10", value: 3.2, label: "Oct" },
-  { date: "2025-11", value: 3.5, label: "Nov" },
-  { date: "2025-12", value: 3.8, label: "Dec" },
-  { date: "2026-01", value: 4.2, label: "Jan" },
+  { date: "2025-07", value: 3, label: "Jul" },
+  { date: "2025-08", value: 3, label: "Aug" },
+  { date: "2025-09", value: 3, label: "Sep" },
+  { date: "2025-10", value: 3, label: "Oct" },
+  { date: "2025-11", value: 4, label: "Nov" },
+  { date: "2025-12", value: 4, label: "Dec" },
+  { date: "2026-01", value: 4, label: "Jan" },
 ]
 
 export const burnTrendData: TrendData[] = [

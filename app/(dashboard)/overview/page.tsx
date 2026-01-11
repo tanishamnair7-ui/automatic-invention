@@ -61,10 +61,10 @@ export default function OverviewPage() {
     {
       id: "op-forecast-accuracy",
       name: "Forecast Accuracy",
-      value: 92.5,
+      value: 93,
       unit: "%",
       target: 95,
-      trendPct: 3.2,
+      trendPct: 3,
       status: "yellow",
       owner: "Finance Planning",
       definition: "Accuracy of financial projections vs actuals",
@@ -75,10 +75,10 @@ export default function OverviewPage() {
     {
       id: "op-pipeline-coverage",
       name: "Pipeline Coverage",
-      value: 2.3,
+      value: 2,
       unit: "x",
-      target: 3.0,
-      trendPct: 8.5,
+      target: 3,
+      trendPct: 9,
       status: "yellow",
       owner: "Commercial Engine",
       definition: "Pipeline value as multiple of quarterly target",
@@ -92,7 +92,7 @@ export default function OverviewPage() {
       value: 42,
       unit: "",
       target: 50,
-      trendPct: 5.0,
+      trendPct: 5,
       status: "yellow",
       owner: "Customer Voice",
       definition: "Net Promoter Score - customer satisfaction metric",
@@ -106,7 +106,7 @@ export default function OverviewPage() {
       value: 38,
       unit: "",
       target: 40,
-      trendPct: 2.7,
+      trendPct: 3,
       status: "green",
       owner: "People Health",
       definition: "Employee Net Promoter Score - team satisfaction",
@@ -117,10 +117,10 @@ export default function OverviewPage() {
     {
       id: "op-sla-resolution",
       name: "SLA Resolution Time",
-      value: 2.4,
+      value: 2,
       unit: "hours",
-      target: 2.0,
-      trendPct: 8.5,
+      target: 2,
+      trendPct: 9,
       status: "yellow",
       owner: "Service Performance",
       definition: "Average time to resolve customer support tickets",
@@ -165,7 +165,7 @@ export default function OverviewPage() {
     {
       id: "watch-2",
       title: "Pipeline Coverage Gap",
-      message: "Pipeline at 2.3x quarterly target (need 3.0x) - accelerate partnership prospecting.",
+      message: "Pipeline at 2x quarterly target (need 3x) - accelerate partnership prospecting.",
       type: "watch" as const,
     },
 
@@ -173,7 +173,7 @@ export default function OverviewPage() {
     {
       id: "monitor-1",
       title: "Forecast Accuracy Below Target",
-      message: "Financial forecast accuracy at 92.5% vs 95% target - refine projection models.",
+      message: "Financial forecast accuracy at 93% vs 95% target - refine projection models.",
       type: "concern" as const,
     },
     {
@@ -187,7 +187,7 @@ export default function OverviewPage() {
     {
       id: "urgent-1",
       title: "Runway Below Threshold",
-      message: "Cash runway at 8.4 months, below 9-month minimum. Burn reduction and cash management critical.",
+      message: "Cash runway at 8 months, below 9-month minimum. Burn reduction and cash management critical.",
       type: "urgent" as const,
       action: {
         label: "View 13-week cash forecast →",
@@ -197,20 +197,20 @@ export default function OverviewPage() {
     {
       id: "urgent-2",
       title: "Churn Spike Detected",
-      message: `${churnedAccounts} accounts churned this period (${((churnedAccounts / activeCustomers) * 100).toFixed(1)}% churn rate). Review NPS scores for churned accounts. Review renewal pipeline.`,
+      message: `${churnedAccounts} accounts churned this period (${((churnedAccounts / activeCustomers) * 100).toFixed(0)}% churn rate). Review NPS scores for churned accounts. Review renewal pipeline.`,
       type: "urgent" as const,
     },
   ]
 
   // Prepare metrics for switchable chart
   const runwayTrendData: TrendData[] = [
-    { date: "2025-07", value: 13.0, label: "Jul" },
-    { date: "2025-08", value: 12.1, label: "Aug" },
-    { date: "2025-09", value: 10.8, label: "Sep" },
-    { date: "2025-10", value: 9.6, label: "Oct" },
-    { date: "2025-11", value: 9.3, label: "Nov" },
-    { date: "2025-12", value: 8.9, label: "Dec" },
-    { date: "2026-01", value: 8.4, label: "Jan" },
+    { date: "2025-07", value: 13, label: "Jul" },
+    { date: "2025-08", value: 12, label: "Aug" },
+    { date: "2025-09", value: 11, label: "Sep" },
+    { date: "2025-10", value: 10, label: "Oct" },
+    { date: "2025-11", value: 9, label: "Nov" },
+    { date: "2025-12", value: 9, label: "Dec" },
+    { date: "2026-01", value: 8, label: "Jan" },
   ]
 
   const chartMetrics = [
@@ -226,7 +226,7 @@ export default function OverviewPage() {
       name: "Runway (months)",
       data: runwayTrendData,
       color: "#D45A3E",
-      formatValue: (value: number) => `${value.toFixed(1)} mo`,
+      formatValue: (value: number) => `${value.toFixed(0)} mo`,
     },
     {
       id: "burn",
@@ -247,7 +247,7 @@ export default function OverviewPage() {
       name: "Churn Rate",
       data: churnTrendData,
       color: "#D45A3E",
-      formatValue: (value: number) => `${value.toFixed(1)}%`,
+      formatValue: (value: number) => `${value.toFixed(0)}%`,
     },
   ]
 

@@ -17,10 +17,10 @@ export function KpiCard({ kpi, onInfoClick }: KpiCardProps) {
         return `$${value.toLocaleString()}`
       }
       if (unit === "%") {
-        return `${value.toFixed(1)}%`
+        return `${value.toFixed(0)}%`
       }
       if (unit === "months") {
-        return `${value.toFixed(1)} months`
+        return `${value.toFixed(0)} months`
       }
       return value.toLocaleString()
     }
@@ -90,7 +90,7 @@ export function KpiCard({ kpi, onInfoClick }: KpiCardProps) {
             </span>
             <div className={cn("flex items-center gap-1 font-medium", trendColor)}>
               <TrendIcon className="h-4 w-4" />
-              <span>{Math.abs(kpi.trendPct).toFixed(1)}% vs PM</span>
+              <span>{Math.abs(kpi.trendPct).toFixed(0)}% vs PM</span>
             </div>
           </div>
         </div>

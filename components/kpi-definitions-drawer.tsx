@@ -29,10 +29,10 @@ export function KpiDefinitionsDrawer({
         return `$${value.toLocaleString()}`
       }
       if (unit === "%") {
-        return `${value.toFixed(1)}%`
+        return `${value.toFixed(0)}%`
       }
       if (unit === "months") {
-        return `${value.toFixed(1)} months`
+        return `${value.toFixed(0)} months`
       }
       return value.toLocaleString()
     }
@@ -72,7 +72,7 @@ export function KpiDefinitionsDrawer({
               {formatValue(kpi.value, kpi.unit)}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Target: {formatValue(kpi.target, kpi.unit)} | Trend: {kpi.trendPct >= 0 ? '+' : ''}{kpi.trendPct.toFixed(1)}%
+              Target: {formatValue(kpi.target, kpi.unit)} | Trend: {kpi.trendPct >= 0 ? '+' : ''}{kpi.trendPct.toFixed(0)}%
             </p>
           </div>
 

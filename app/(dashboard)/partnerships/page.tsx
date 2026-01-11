@@ -36,12 +36,12 @@ export default function PartnershipsPage() {
   const atRiskValue = lowNpsPartners.reduce((sum, c) => sum + c.value, 0)
 
   const insights = [
-    `Partnership pipeline: $${(totalPipelineValue / 1000000).toFixed(1)}M total value across ${deals.length} opportunities, $${(weightedPipelineValue / 1000000).toFixed(1)}M weighted by probability. Strong pipeline coverage.`,
+    `Partnership pipeline: $${(totalPipelineValue / 1000000).toFixed(0)}M total value across ${deals.length} opportunities, $${(weightedPipelineValue / 1000000).toFixed(0)}M weighted by probability. Strong pipeline coverage.`,
     `Active contracts worth $${(partnershipContracts.reduce((sum, c) => sum + c.value, 0) / 1000).toFixed(0)}k with avg NPS of ${avgPartnerNps.toFixed(0)}. Critical issues: HealthTech Solutions (NPS 28) and Fitness Network Global (NPS 18) require immediate attention.`,
     `$${(atRiskValue / 1000).toFixed(0)}k in contract value at risk from low NPS partners (<35). Pattern: overdue contacts (HealthTech: 24 days, Fitness Network: 37 days). Schedule executive QBRs immediately.`,
     `Pipeline funnel: 30 prospects → 15 qualified (50% conversion) → 8 proposals (53% conversion) → 5 negotiating (63% conversion) → 3 won. Top of funnel is healthy but watch proposal→negotiation conversion.`,
     `Commission structure: At 10% rate on avg deal ($${(avgDealSize / 1000).toFixed(0)}k), expect $${(avgDealSize * 0.10 / 1000).toFixed(0)}k per closed deal. Review rates for strategic partnerships (higher value, lower margin).`,
-    `Weighted pipeline value ($${(weightedPipelineValue / 1000000).toFixed(1)}M) represents realistic expected revenue based on stage probabilities. Focus on moving negotiation stage deals (avg 70% prob) to close.`,
+    `Weighted pipeline value ($${(weightedPipelineValue / 1000000).toFixed(0)}M) represents realistic expected revenue based on stage probabilities. Focus on moving negotiation stage deals (avg 70% prob) to close.`,
   ]
 
   return (

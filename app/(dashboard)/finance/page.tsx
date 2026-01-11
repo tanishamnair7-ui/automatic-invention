@@ -136,7 +136,7 @@ export default function FinancePage() {
                         }
                       >
                         {isOverBudget ? "+" : ""}
-                        {item.variancePct.toFixed(1)}%
+                        {item.variancePct.toFixed(0)}%
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -171,7 +171,7 @@ export default function FinancePage() {
                       (budgetItems.reduce((sum, item) => sum + item.variance, 0) /
                         budgetItems.reduce((sum, item) => sum + item.budgeted, 0)) *
                       100
-                    ).toFixed(1)}
+                    ).toFixed(0)}
                     %
                   </Badge>
                 </TableCell>

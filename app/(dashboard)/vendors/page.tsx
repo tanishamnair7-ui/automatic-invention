@@ -133,7 +133,7 @@ export default function VendorsPage() {
                 cy="50%"
                 labelLine={false}
                 label={({ name, value }) =>
-                  `${name}: $${(value / 1000).toFixed(1)}k`
+                  `${name}: $${(value / 1000).toFixed(0)}k`
                 }
                 outerRadius={100}
                 fill="#8884d8"

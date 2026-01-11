@@ -35,7 +35,7 @@ export function ScenarioPlanner({ scenarios }: ScenarioPlannerProps) {
     )
 
     const cashBalance = 2400000
-    const runwayMonths = Number((cashBalance / burn).toFixed(1))
+    const runwayMonths = Number((cashBalance / burn).toFixed(0))
 
     return { mrr, burn, runwayMonths }
   }
@@ -169,7 +169,7 @@ export function ScenarioPlanner({ scenarios }: ScenarioPlannerProps) {
                       <label className="text-sm text-muted-foreground flex justify-between mb-2">
                         <span>Churn Rate (%)</span>
                         <span className="font-medium text-foreground">
-                          {assumptions.churn.toFixed(1)}%
+                          {assumptions.churn.toFixed(0)}%
                         </span>
                       </label>
                       <input

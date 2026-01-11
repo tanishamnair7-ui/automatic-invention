@@ -96,7 +96,7 @@ export default function RevenuePage() {
           data={churnTrendData}
           type="line"
           color="#D45A3E"
-          formatValue={(value) => `${value.toFixed(1)}%`}
+          formatValue={(value) => `${value.toFixed(0)}%`}
         />
       </div>
 
@@ -385,7 +385,7 @@ export default function RevenuePage() {
                       </div>
                       <div>
                         <p className="text-muted-foreground">Response Time</p>
-                        <p className="font-medium">{csm.avgResponseTime.toFixed(1)}h</p>
+                        <p className="font-medium">{csm.avgResponseTime.toFixed(0)}h</p>
                       </div>
                     </div>
                   </div>

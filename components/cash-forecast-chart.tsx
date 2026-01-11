@@ -65,7 +65,7 @@ export function CashForecastChart({
         )}
         {value && (
           <p className="text-xs text-muted-foreground mt-1">
-            Runway: {(value / monthlyBurn).toFixed(1)} months
+            Runway: {(value / monthlyBurn).toFixed(0)} months
           </p>
         )}
       </div>
@@ -132,7 +132,7 @@ export function CashForecastChart({
                 strokeWidth={2}
               >
                 <Label
-                  value={`Min Buffer (${(minimumBuffer / monthlyBurn).toFixed(1)}mo)`}
+                  value={`Min Buffer (${(minimumBuffer / monthlyBurn).toFixed(0)}mo)`}
                   position="insideTopRight"
                   fill="#E56B4E"
                   fontSize={11}

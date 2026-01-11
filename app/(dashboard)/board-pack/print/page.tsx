@@ -93,8 +93,8 @@ export default function BoardPackPrintPage() {
             const formatValue = (value: number | string, unit: string) => {
               if (typeof value === "number") {
                 if (unit === "$") return `$${value.toLocaleString()}`
-                if (unit === "%") return `${value.toFixed(1)}%`
-                if (unit === "months") return `${value.toFixed(1)} months`
+                if (unit === "%") return `${value.toFixed(0)}%`
+                if (unit === "months") return `${value.toFixed(0)} months`
                 return value.toLocaleString()
               }
               return value
@@ -125,7 +125,7 @@ export default function BoardPackPrintPage() {
                 <p className="text-xs text-muted-foreground">
                   Target: {formatValue(kpi.target, kpi.unit)} •{" "}
                   {kpi.trendPct >= 0 ? "+" : ""}
-                  {kpi.trendPct.toFixed(1)}%
+                  {kpi.trendPct.toFixed(0)}%
                 </p>
               </div>
             )

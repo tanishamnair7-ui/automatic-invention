@@ -26,10 +26,10 @@ export default function OperationsPage() {
     {
       id: "op-forecast-accuracy",
       name: "Forecast Accuracy",
-      value: 92.5,
+      value: 93,
       unit: "%",
       target: 95,
-      trendPct: 3.2,
+      trendPct: 3,
       status: "yellow",
       owner: "Finance Planning",
       definition: "Accuracy of financial projections vs actuals",
@@ -40,10 +40,10 @@ export default function OperationsPage() {
     {
       id: "op-pipeline-coverage",
       name: "Pipeline Coverage",
-      value: 2.3,
+      value: 2,
       unit: "x",
-      target: 3.0,
-      trendPct: 8.5,
+      target: 3,
+      trendPct: 9,
       status: "yellow",
       owner: "Commercial Engine",
       definition: "Pipeline value as multiple of quarterly target",
@@ -57,7 +57,7 @@ export default function OperationsPage() {
       value: 42,
       unit: "",
       target: 50,
-      trendPct: 5.0,
+      trendPct: 5,
       status: "yellow",
       owner: "Customer Voice",
       definition: "Net Promoter Score - customer satisfaction metric",
@@ -71,7 +71,7 @@ export default function OperationsPage() {
       value: 38,
       unit: "",
       target: 40,
-      trendPct: 2.7,
+      trendPct: 3,
       status: "green",
       owner: "People Health",
       definition: "Employee Net Promoter Score - team satisfaction",
@@ -82,10 +82,10 @@ export default function OperationsPage() {
     {
       id: "op-sla-resolution",
       name: "SLA Resolution Time",
-      value: 2.4,
+      value: 2,
       unit: "hours",
-      target: 2.0,
-      trendPct: 8.5,
+      target: 2,
+      trendPct: 9,
       status: "yellow",
       owner: "Service Performance",
       definition: "Average time to resolve customer support tickets",
@@ -119,11 +119,11 @@ export default function OperationsPage() {
   }
 
   const insights = [
-    "SLA Resolution Time at 2.4hrs (target: 2.0hrs) due to 40% increase in support ticket volume - hiring plan in progress",
+    "SLA Resolution Time at 2hrs (target: 2hrs) due to 40% increase in support ticket volume - hiring plan in progress",
     "Lab processing is critical bottleneck (48hr SLA missed 15% of time) - backup vendor contract pending signature by 2026-01-14",
-    "Forecast Accuracy at 92.5% vs 95% target - need tighter alignment between sales pipeline and finance projections",
+    "Forecast Accuracy at 93% vs 95% target - need tighter alignment between sales pipeline and finance projections",
     "NPS at 42 (target: 50) and eNPS at 38 (target: 40) - customer and employee satisfaction need focus",
-    "Pipeline Coverage at 2.3x vs 3.0x target - commercial engine needs more top-of-funnel activity to hit quarterly goals",
+    "Pipeline Coverage at 2x vs 3x target - commercial engine needs more top-of-funnel activity to hit quarterly goals",
   ]
 
   return (
