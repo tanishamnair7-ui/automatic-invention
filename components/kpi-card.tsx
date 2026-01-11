@@ -49,7 +49,9 @@ export function KpiCard({ kpi, onInfoClick }: KpiCardProps) {
   const config = statusConfig[kpi.status]
   const StatusIcon = config.icon
 
-  const trendColor = kpi.trendPct >= 0 ? "text-green-600" : "text-red-600"
+  // For inverse metrics (churn, burn, etc.), higher is worse, so flip the colors
+  const isPositiveTrend = kpi.inverse ? kpi.trendPct < 0 : kpi.trendPct >= 0
+  const trendColor = isPositiveTrend ? "text-green-600" : "text-red-600"
   const TrendIcon = kpi.trendPct >= 0 ? ArrowUp : ArrowDown
 
   return (

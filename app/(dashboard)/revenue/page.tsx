@@ -15,9 +15,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { kpis, pricingExperiments, mrrTrendData, churnTrendData } from "@/data/mock"
+import {
+  kpis,
+  mrrTrendData,
+  churnTrendData,
+  salesDeals,
+  renewalAccounts,
+  salesReps,
+  csms,
+} from "@/data/mock"
 import { KPI } from "@/data/types"
-import { TrendingUp, DollarSign } from "lucide-react"
+import { CheckCircle, AlertCircle, XCircle, AlertTriangle, Target } from "lucide-react"
 
 export default function RevenuePage() {
   const [selectedKpi, setSelectedKpi] = useState<KPI | null>(null)
@@ -26,31 +34,33 @@ export default function RevenuePage() {
     ["MRR", "ARR", "Churn Rate", "ARPU", "CAC", "LTV"].includes(kpi.name)
   )
 
+  // Calculate pipeline metrics
+  const totalPipelineValue = salesDeals.reduce(
+    (sum, deal) => sum + deal.dealValue * (deal.probability / 100),
+    0
+  )
+  const totalDealValue = salesDeals.reduce((sum, deal) => sum + deal.dealValue, 0)
+  const avgDealSize = totalDealValue / salesDeals.length
+
+  // Calculate renewal metrics
+  const totalRenewalArr = renewalAccounts.reduce((sum, acc) => sum + acc.arr, 0)
+  const atRiskArr = renewalAccounts
+    .filter((acc) => acc.risk === "High")
+    .reduce((sum, acc) => sum + acc.arr, 0)
+  const avgNps = renewalAccounts.reduce((sum, acc) => sum + acc.nps, 0) / renewalAccounts.length
+
   const insights = [
-    "MRR growth of 8.3% is strong - on track to hit $150k target by end of Q1",
-    "Churn spike to 4.2% is concerning - retention program is top priority",
-    "CAC increased 14% to $285 - need to optimize marketing spend efficiency",
-    "LTV:CAC ratio is 5.0 (healthy) but trending down due to churn and CAC increases",
-    "Annual plan discount experiment successful - rolling out to all users will improve cash flow",
-    "Freemium tier showing early promise - 9% conversion vs 12% target",
+    `Sales pipeline shows $${(totalPipelineValue / 1000).toFixed(0)}k weighted value across ${salesDeals.length} deals (avg: $${(avgDealSize / 1000).toFixed(0)}k). Healthcare & Corporate Wellness driving largest opportunities.`,
+    `Renewal pipeline at $${(totalRenewalArr / 1000).toFixed(0)}k ARR with $${(atRiskArr / 1000).toFixed(0)}k at high risk. MindfulCare Network (NPS 18) and WellLife Corp (NPS 32) require immediate executive intervention.`,
+    "Sales performance mixed: Alex Chen at 77% of quota (strong), Jordan Lee at 59% (needs support). Pipeline coverage shows Alex has 71% quota in pipe vs Jordan's 35% - reallocate leads to Alex.",
+    "CSM performance: Rachel Foster leading with 62 avg NPS and 0 at-risk renewals. David Kim managing 2 at-risk accounts (20% of his portfolio) - needs immediate support on MindfulCare and WellLife.",
+    `Low NPS accounts (< 35) represent $${((95000 + 75000 + 165000) / 1000).toFixed(0)}k ARR renewal risk. Pattern: overdue contacts (WellLife 22 days, Corporate Health Co 14 days). Enforce weekly touch cadence for yellow/red accounts.`,
   ]
 
-  // Calculate unit economics
-  const cacKpi = kpis.find((k) => k.name === "CAC")!
-  const ltvKpi = kpis.find((k) => k.name === "LTV")!
-  const arpuKpi = kpis.find((k) => k.name === "ARPU")!
-  const churnKpi = kpis.find((k) => k.name === "Churn Rate")!
-
-  const ltv = Number(ltvKpi.value)
-  const cac = Number(cacKpi.value)
-  const ltvCacRatio = (ltv / cac).toFixed(1)
-  const paybackMonths = ((cac / Number(arpuKpi.value)).toFixed(1))
-
-  const experimentStatusColors = {
-    planning: "bg-blue-50 text-blue-700 border-blue-200",
-    running: "bg-yellow-50 text-yellow-700 border-yellow-200",
-    completed: "bg-green-50 text-green-700 border-green-200",
-    cancelled: "bg-gray-50 text-gray-700 border-gray-200",
+  const healthConfig = {
+    green: { icon: CheckCircle, color: "text-green-600", bg: "bg-green-50" },
+    yellow: { icon: AlertCircle, color: "text-yellow-600", bg: "bg-yellow-50" },
+    red: { icon: XCircle, color: "text-red-600", bg: "bg-red-50" },
   }
 
   return (
@@ -58,7 +68,7 @@ export default function RevenuePage() {
       <div>
         <h1 className="text-3xl font-bold mb-2">Revenue</h1>
         <p className="text-muted-foreground">
-          Subscription metrics, pricing experiments, and unit economics
+          Subscription metrics, sales pipeline, renewals, and team performance
         </p>
       </div>
 
@@ -90,190 +100,301 @@ export default function RevenuePage() {
         />
       </div>
 
-      {/* Unit Economics Panel */}
-      <Card className="bg-gradient-to-br from-accent-2/20 to-accent/10 border-accent/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-accent" />
-            Unit Economics
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">
-                Customer Acquisition Cost (CAC)
-              </p>
-              <p className="text-3xl font-bold mb-2">${cac}</p>
-              <p className="text-xs text-muted-foreground">
-                Total Marketing & Sales Spend ÷ New Customers
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">
-                Lifetime Value (LTV)
-              </p>
-              <p className="text-3xl font-bold mb-2">${ltv.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">
-                ARPU ÷ Churn Rate
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">
-                LTV:CAC Ratio
-              </p>
-              <p className="text-3xl font-bold mb-2">{ltvCacRatio}x</p>
-              <p className="text-xs text-muted-foreground">
-                Target: 3x+ (Healthy: 3-5x)
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-accent/20">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Split Section: Sales Pipeline & Renewals */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Sales Pipeline */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Sales Pipeline (First Sales)</CardTitle>
+            <div className="grid grid-cols-2 gap-4 mt-3">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
-                  Payback Period
-                </p>
-                <p className="text-xl font-semibold">{paybackMonths} months</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Time to recover acquisition cost
+                <p className="text-sm text-muted-foreground">Pipeline Value</p>
+                <p className="text-2xl font-bold">${(totalDealValue / 1000).toFixed(0)}k</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Weighted Value</p>
+                <p className="text-2xl font-bold">${(totalPipelineValue / 1000).toFixed(0)}k</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Deals</p>
+                <p className="text-2xl font-bold">{salesDeals.length}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Avg Deal Size</p>
+                <p className="text-2xl font-bold">${(avgDealSize / 1000).toFixed(0)}k</p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 max-h-[500px] overflow-y-auto">
+              {salesDeals
+                .sort((a, b) => b.dealValue - a.dealValue)
+                .map((deal) => (
+                  <div
+                    key={deal.id}
+                    className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="font-semibold">{deal.companyName}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {deal.industry} • {deal.companySize}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-lg">
+                          ${(deal.dealValue / 1000).toFixed(0)}k
+                        </p>
+                        <Badge variant="outline" className="text-xs">
+                          {deal.probability}% prob
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">{deal.stage}</Badge>
+                        <span className="text-muted-foreground">
+                          Contact: {deal.contactName}
+                        </span>
+                      </div>
+                      <p className="text-muted-foreground">
+                        <span className="font-medium">Next:</span> {deal.nextStep}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Owner: {deal.owner} • Close: {new Date(deal.closeDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Renewal Pipeline */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Renewal Pipeline</CardTitle>
+            <div className="grid grid-cols-2 gap-4 mt-3">
+              <div>
+                <p className="text-sm text-muted-foreground">Total ARR</p>
+                <p className="text-2xl font-bold">${(totalRenewalArr / 1000).toFixed(0)}k</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">At Risk ARR</p>
+                <p className="text-2xl font-bold text-red-600">
+                  ${(atRiskArr / 1000).toFixed(0)}k
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
-                  Monthly ARPU
-                </p>
-                <p className="text-xl font-semibold">${Number(arpuKpi.value)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  MRR ÷ Active Customers
-                </p>
+                <p className="text-sm text-muted-foreground">Accounts</p>
+                <p className="text-2xl font-bold">{renewalAccounts.length}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Avg NPS</p>
+                <p className="text-2xl font-bold">{avgNps.toFixed(0)}</p>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 max-h-[500px] overflow-y-auto">
+              {renewalAccounts
+                .sort((a, b) => new Date(a.renewalDate).getTime() - new Date(b.renewalDate).getTime())
+                .map((account) => {
+                  const config = healthConfig[account.health]
+                  const HealthIcon = config.icon
+                  const daysSinceContact = Math.floor(
+                    (new Date().getTime() - new Date(account.lastContact).getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  )
+                  const needsContact = account.nps < 35 || daysSinceContact > 14
 
-      {/* Pricing & Packaging Experiments */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Pricing & Packaging Experiments</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {pricingExperiments.map((experiment) => (
-              <div
-                key={experiment.id}
-                className="border border-border rounded-xl p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold">{experiment.name}</h3>
+                  return (
+                    <div
+                      key={account.id}
+                      className={`border rounded-lg p-4 ${config.bg} border-${account.health === "green" ? "green" : account.health === "yellow" ? "yellow" : "red"}-200`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-start gap-2">
+                          <HealthIcon className={`h-5 w-5 mt-0.5 ${config.color}`} />
+                          <div>
+                            <h3 className="font-semibold">{account.companyName}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              CSM: {account.csm}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-lg">
+                            ${(account.arr / 1000).toFixed(0)}k ARR
+                          </p>
+                          <Badge
+                            variant="outline"
+                            className={`text-xs ${account.nps >= 50 ? "bg-green-50" : account.nps >= 35 ? "bg-yellow-50" : "bg-red-50"}`}
+                          >
+                            NPS {account.nps}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="space-y-1 text-sm">
+                        <p className="text-muted-foreground">
+                          <span className="font-medium">Renewal:</span>{" "}
+                          {new Date(account.renewalDate).toLocaleDateString()}
+                        </p>
+                        <p className="text-muted-foreground">
+                          <span className="font-medium">Next:</span> {account.nextStep}
+                        </p>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
+                          <span>
+                            Last contact: {daysSinceContact} days ago
+                          </span>
+                          {needsContact && (
+                            <Badge variant="destructive" className="text-xs">
+                              <AlertTriangle className="h-3 w-3 mr-1" />
+                              Contact Now
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Team Performance */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Sales Team */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Sales Team Performance
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {salesReps.map((rep) => {
+                const quotaAttainment = (rep.closed / rep.quota) * 100
+                const pipelineCoverage = (rep.pipeline / rep.quota) * 100
+
+                return (
+                  <div key={rep.id} className="border border-border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-lg">{rep.name}</h3>
                       <Badge
-                        variant="outline"
-                        className={experimentStatusColors[experiment.status]}
+                        variant={quotaAttainment >= 75 ? "default" : "outline"}
+                        className={quotaAttainment >= 75 ? "bg-green-600" : ""}
                       >
-                        {experiment.status}
+                        {quotaAttainment.toFixed(0)}% to quota
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      <span className="font-medium">Hypothesis:</span>{" "}
-                      {experiment.hypothesis}
-                    </p>
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Closed</p>
+                        <p className="font-semibold">${(rep.closed / 1000).toFixed(0)}k</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Pipeline</p>
+                        <p className="font-semibold">${(rep.pipeline / 1000).toFixed(0)}k</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Quota</p>
+                        <p className="font-semibold">${(rep.quota / 1000).toFixed(0)}k</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-xs">
+                      <div>
+                        <p className="text-muted-foreground">Deals Active</p>
+                        <p className="font-medium">{rep.dealsInProgress}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Avg Deal Size</p>
+                        <p className="font-medium">${(rep.avgDealSize / 1000).toFixed(0)}k</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Win Rate</p>
+                        <p className="font-medium">{rep.winRate}%</p>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Pipeline Coverage</span>
+                        <span className={`font-medium ${pipelineCoverage >= 50 ? "text-green-600" : "text-red-600"}`}>
+                          {pipelineCoverage.toFixed(0)}% of quota
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>
-                    Start:{" "}
-                    {new Date(experiment.startDate).toLocaleDateString()}
-                  </span>
-                  {experiment.endDate && (
-                    <span>
-                      End:{" "}
-                      {new Date(experiment.endDate).toLocaleDateString()}
-                    </span>
-                  )}
-                </div>
+        {/* CSM Team */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5" />
+              Customer Success Team
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {csms.map((csm) => {
+                const arrPerAccount = csm.totalArr / csm.accountsManaged
+                const atRiskPct = (csm.renewalsAtRisk / csm.accountsManaged) * 100
 
-                {experiment.result && (
-                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-sm text-green-800">
-                      <span className="font-medium">Result:</span>{" "}
-                      {experiment.result}
-                    </p>
+                return (
+                  <div key={csm.id} className="border border-border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-lg">{csm.name}</h3>
+                      <Badge
+                        variant={csm.avgNps >= 50 ? "default" : "outline"}
+                        className={csm.avgNps >= 50 ? "bg-green-600" : ""}
+                      >
+                        NPS {csm.avgNps}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Accounts</p>
+                        <p className="font-semibold">{csm.accountsManaged}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Total ARR</p>
+                        <p className="font-semibold">${(csm.totalArr / 1000).toFixed(0)}k</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">ARR/Account</p>
+                        <p className="font-semibold">${(arrPerAccount / 1000).toFixed(0)}k</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-xs">
+                      <div>
+                        <p className="text-muted-foreground">At Risk</p>
+                        <p className={`font-medium ${csm.renewalsAtRisk > 0 ? "text-red-600" : "text-green-600"}`}>
+                          {csm.renewalsAtRisk} ({atRiskPct.toFixed(0)}%)
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Expansion Opps</p>
+                        <p className="font-medium text-green-600">{csm.expansionOpportunities}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Response Time</p>
+                        <p className="font-medium">{csm.avgResponseTime.toFixed(1)}h</p>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Retention Cohort (Mock Chart) */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Retention Cohort Analysis
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Cohort</TableHead>
-                <TableHead className="text-right">Month 0</TableHead>
-                <TableHead className="text-right">Month 1</TableHead>
-                <TableHead className="text-right">Month 2</TableHead>
-                <TableHead className="text-right">Month 3</TableHead>
-                <TableHead className="text-right">Month 6</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">Oct 2025</TableCell>
-                <TableCell className="text-right">100%</TableCell>
-                <TableCell className="text-right">94%</TableCell>
-                <TableCell className="text-right">89%</TableCell>
-                <TableCell className="text-right">85%</TableCell>
-                <TableCell className="text-right">-</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Nov 2025</TableCell>
-                <TableCell className="text-right">100%</TableCell>
-                <TableCell className="text-right">92%</TableCell>
-                <TableCell className="text-right">87%</TableCell>
-                <TableCell className="text-right">-</TableCell>
-                <TableCell className="text-right">-</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Dec 2025</TableCell>
-                <TableCell className="text-right">100%</TableCell>
-                <TableCell className="text-right">91%</TableCell>
-                <TableCell className="text-right">-</TableCell>
-                <TableCell className="text-right">-</TableCell>
-                <TableCell className="text-right">-</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Jan 2026</TableCell>
-                <TableCell className="text-right">100%</TableCell>
-                <TableCell className="text-right">-</TableCell>
-                <TableCell className="text-right">-</TableCell>
-                <TableCell className="text-right">-</TableCell>
-                <TableCell className="text-right">-</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-          <p className="text-xs text-muted-foreground mt-4">
-            Note: Retention trending down in recent cohorts - validates need for
-            retention program
-          </p>
-        </CardContent>
-      </Card>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Insights */}
       <InsightsPanel insights={insights} />

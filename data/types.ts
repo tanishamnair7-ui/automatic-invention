@@ -14,6 +14,7 @@ export const KPISchema = z.object({
   formula: z.string(),
   source: z.string(),
   updatedAt: z.string(),
+  inverse: z.boolean().optional(), // True if lower values are better (e.g., churn, burn, response time)
 })
 
 export type KPI = z.infer<typeof KPISchema>
@@ -218,6 +219,67 @@ export const ProcurementRequestSchema = z.object({
 })
 
 export type ProcurementRequest = z.infer<typeof ProcurementRequestSchema>
+
+// Sales Deal Schema and Type (for first sales pipeline)
+export const SalesDealSchema = z.object({
+  id: z.string(),
+  companyName: z.string(),
+  industry: z.string(),
+  dealValue: z.number(),
+  stage: z.enum(["Lead", "Qualified", "Demo", "Proposal", "Negotiation", "Closed Won", "Closed Lost"]),
+  probability: z.number(),
+  companySize: z.string(),
+  contactName: z.string(),
+  nextStep: z.string(),
+  closeDate: z.string(),
+  owner: z.string(),
+})
+
+export type SalesDeal = z.infer<typeof SalesDealSchema>
+
+// Renewal Account Schema and Type
+export const RenewalAccountSchema = z.object({
+  id: z.string(),
+  companyName: z.string(),
+  arr: z.number(),
+  renewalDate: z.string(),
+  health: z.enum(["green", "yellow", "red"]),
+  nps: z.number(),
+  lastContact: z.string(),
+  nextStep: z.string(),
+  risk: z.enum(["Low", "Medium", "High"]),
+  csm: z.string(),
+})
+
+export type RenewalAccount = z.infer<typeof RenewalAccountSchema>
+
+// Sales Rep Schema and Type
+export const SalesRepSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  quota: z.number(),
+  closed: z.number(),
+  pipeline: z.number(),
+  dealsInProgress: z.number(),
+  avgDealSize: z.number(),
+  winRate: z.number(),
+})
+
+export type SalesRep = z.infer<typeof SalesRepSchema>
+
+// Customer Success Manager Schema and Type
+export const CSMSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  accountsManaged: z.number(),
+  totalArr: z.number(),
+  avgNps: z.number(),
+  renewalsAtRisk: z.number(),
+  expansionOpportunities: z.number(),
+  avgResponseTime: z.number(),
+})
+
+export type CSM = z.infer<typeof CSMSchema>
 
 // Chart Data Types
 export interface ChartDataPoint {
