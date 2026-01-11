@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
@@ -31,8 +32,15 @@ export function Sidebar() {
   return (
     <div className="flex h-full w-64 flex-col bg-card border-r border-border">
       {/* Logo */}
-      <div className="flex h-16 items-center border-b border-border px-6">
-        <h1 className="text-2xl font-bold text-primary">Hormona</h1>
+      <div className="flex h-16 items-center gap-3 border-b border-border px-6">
+        <Image
+          src="/hormona-logo.png"
+          alt="Hormona"
+          width={40}
+          height={40}
+          className="flex-shrink-0"
+        />
+        <h1 className="text-xl font-bold text-primary">Hormona</h1>
       </div>
 
       {/* Navigation */}
