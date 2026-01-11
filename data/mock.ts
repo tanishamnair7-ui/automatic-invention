@@ -240,63 +240,30 @@ export const forecastScenarios: ForecastScenario[] = [
   },
 ]
 
-// Deals / Partnerships
+// Deals / Partnerships - Realistic pipeline with aggregated counts
+// Helper function to generate deals for each stage
+const generateDeals = (count: number, stage: string, avgValue: number, avgProbability: number): Deal[] => {
+  const types = ["Distribution Partnership", "Integration Partnership", "Channel Partnership", "Co-Marketing", "Affiliate Partnership", "Referral Partnership"]
+  return Array.from({ length: count }, (_, i) => ({
+    id: `deal-${stage.toLowerCase().replace(/\s+/g, '-')}-${i + 1}`,
+    partnerName: `Partner ${i + 1}`,
+    type: types[Math.floor(Math.random() * types.length)],
+    stage: stage as Deal["stage"],
+    value: avgValue + (Math.random() - 0.5) * avgValue * 0.4, // +/- 20% variance
+    probability: Math.max(0, Math.min(100, avgProbability + (Math.random() - 0.5) * 20)), // +/- 10% variance
+    nextStep: "In progress",
+    closeDate: new Date(Date.now() + Math.random() * 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    notes: "Partnership opportunity",
+  }))
+}
+
 export const deals: Deal[] = [
-  {
-    id: "deal-1",
-    partnerName: "WellnessCorp",
-    type: "Distribution Partnership",
-    stage: "Negotiation",
-    value: 250000,
-    probability: 70,
-    nextStep: "Legal review of contract terms",
-    closeDate: "2026-02-15",
-    notes: "Strong interest from their VP of Partnerships. Waiting on legal.",
-  },
-  {
-    id: "deal-2",
-    partnerName: "HealthTech Solutions",
-    type: "Integration Partnership",
-    stage: "Proposal",
-    value: 120000,
-    probability: 50,
-    nextStep: "Present technical integration plan",
-    closeDate: "2026-03-01",
-    notes: "Need to demonstrate API capabilities and data security.",
-  },
-  {
-    id: "deal-3",
-    partnerName: "FitLife Insurance",
-    type: "Channel Partnership",
-    stage: "Qualification",
-    value: 500000,
-    probability: 40,
-    nextStep: "Discovery call with decision makers",
-    closeDate: "2026-04-30",
-    notes: "Large opportunity but long sales cycle. Need executive sponsorship.",
-  },
-  {
-    id: "deal-4",
-    partnerName: "Mindful Clinics",
-    type: "Co-Marketing",
-    stage: "Closed Won",
-    value: 75000,
-    probability: 100,
-    nextStep: "Execute joint campaign",
-    closeDate: "2026-01-05",
-    notes: "Contract signed. Campaign launches Feb 1.",
-  },
-  {
-    id: "deal-5",
-    partnerName: "GlobalWellness Network",
-    type: "Affiliate Partnership",
-    stage: "Prospecting",
-    value: 180000,
-    probability: 25,
-    nextStep: "Initial outreach to partnerships team",
-    closeDate: "2026-05-15",
-    notes: "Cold outreach. Waiting for response.",
-  },
+  ...generateDeals(30, "Prospecting", 150000, 20),      // 30 prospects, avg $150k, 20% prob
+  ...generateDeals(15, "Qualification", 180000, 35),    // 15 qualified, avg $180k, 35% prob
+  ...generateDeals(8, "Proposal", 220000, 50),          // 8 in proposal, avg $220k, 50% prob
+  ...generateDeals(5, "Negotiation", 280000, 70),       // 5 in negotiation, avg $280k, 70% prob
+  ...generateDeals(3, "Closed Won", 200000, 100),       // 3 closed won, avg $200k, 100% prob
+  ...generateDeals(2, "Closed Lost", 170000, 0),        // 2 closed lost, avg $170k, 0% prob
 ]
 
 // Vendors

@@ -1,10 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Deal } from "@/data/types"
-import { DollarSign, TrendingUp } from "lucide-react"
 
 interface KanbanProps {
   deals: Deal[]
@@ -62,63 +60,43 @@ export function Kanban({ deals: initialDeals }: KanbanProps) {
                       {stageDeals.length} {stageDeals.length === 1 ? "deal" : "deals"}
                     </Badge>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <p className="text-muted-foreground">Total Value</p>
-                      <p className="font-semibold">${(totalValue / 1000).toFixed(0)}k</p>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <p className="text-muted-foreground mb-1">Total Value</p>
+                      <p className="text-lg font-bold">${(totalValue / 1000).toFixed(0)}k</p>
                     </div>
-                    <div>
-                      <p className="text-muted-foreground">Weighted</p>
-                      <p className="font-semibold">${(weightedValue / 1000).toFixed(0)}k</p>
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <p className="text-muted-foreground mb-1">Weighted</p>
+                      <p className="text-lg font-bold">${(weightedValue / 1000).toFixed(0)}k</p>
                     </div>
-                    <div>
-                      <p className="text-muted-foreground">Avg Deal</p>
-                      <p className="font-semibold">${(avgDealAmount / 1000).toFixed(0)}k</p>
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <p className="text-muted-foreground mb-1">Avg Deal</p>
+                      <p className="text-lg font-bold">${(avgDealAmount / 1000).toFixed(0)}k</p>
                     </div>
-                    <div>
-                      <p className="text-muted-foreground">Avg Prob</p>
-                      <p className="font-semibold">{avgProbability.toFixed(0)}%</p>
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <p className="text-muted-foreground mb-1">Avg Prob</p>
+                      <p className="text-lg font-bold">{avgProbability.toFixed(0)}%</p>
                     </div>
                   </div>
-                </div>
 
-                <div className="space-y-3">
-                  {stageDeals.map((deal) => (
-                    <Card key={deal.id} className="hover:shadow-md transition-shadow">
-                      <CardHeader className="p-4 pb-3">
-                        <CardTitle className="text-sm font-semibold">
-                          {deal.partnerName}
-                        </CardTitle>
-                        <p className="text-xs text-muted-foreground">
-                          {deal.type}
-                        </p>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-1 text-muted-foreground">
-                            <DollarSign className="h-3.5 w-3.5" />
-                            <span>${deal.value.toLocaleString()}</span>
+                  {/* Conversion rate for non-terminal stages */}
+                  {stage !== "Closed Won" && stage !== "Closed Lost" && stageDeals.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="text-xs">
+                        <p className="text-muted-foreground mb-2">Pipeline Health</p>
+                        <div className="space-y-1">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Expected Value:</span>
+                            <span className="font-semibold">${(weightedValue / 1000).toFixed(0)}k</span>
                           </div>
-                          <div className="flex items-center gap-1 text-muted-foreground">
-                            <TrendingUp className="h-3.5 w-3.5" />
-                            <span>{deal.probability}%</span>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Success Rate:</span>
+                            <span className="font-semibold">{avgProbability.toFixed(0)}%</span>
                           </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          <p className="font-medium mb-1">Next Step:</p>
-                          <p>{deal.nextStep}</p>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Close Date:{" "}
-                          {new Date(deal.closeDate).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

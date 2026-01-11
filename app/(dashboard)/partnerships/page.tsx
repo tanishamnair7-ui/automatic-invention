@@ -36,12 +36,12 @@ export default function PartnershipsPage() {
   const atRiskValue = lowNpsPartners.reduce((sum, c) => sum + c.value, 0)
 
   const insights = [
-    `Partnership pipeline: $${(totalPipelineValue / 1000).toFixed(0)}k total value, $${(weightedPipelineValue / 1000).toFixed(0)}k weighted. WellnessCorp ($250k, 70% prob) is largest opportunity - board intro could accelerate close.`,
+    `Partnership pipeline: $${(totalPipelineValue / 1000000).toFixed(1)}M total value across ${deals.length} opportunities, $${(weightedPipelineValue / 1000000).toFixed(1)}M weighted by probability. Strong pipeline coverage.`,
     `Active contracts worth $${(partnershipContracts.reduce((sum, c) => sum + c.value, 0) / 1000).toFixed(0)}k with avg NPS of ${avgPartnerNps.toFixed(0)}. Critical issues: HealthTech Solutions (NPS 28) and Fitness Network Global (NPS 18) require immediate attention.`,
     `$${(atRiskValue / 1000).toFixed(0)}k in contract value at risk from low NPS partners (<35). Pattern: overdue contacts (HealthTech: 24 days, Fitness Network: 37 days). Schedule executive QBRs immediately.`,
-    "Stage conversion analysis: Only 1 deal in Prospecting - need to increase top-of-funnel. 3 deals in Proposal/Negotiation stages suggest strong conversion momentum.",
+    `Pipeline funnel: 30 prospects → 15 qualified (50% conversion) → 8 proposals (53% conversion) → 5 negotiating (63% conversion) → 3 won. Top of funnel is healthy but watch proposal→negotiation conversion.`,
     `Commission structure: At 10% rate on avg deal ($${(avgDealSize / 1000).toFixed(0)}k), expect $${(avgDealSize * 0.10 / 1000).toFixed(0)}k per closed deal. Review rates for strategic partnerships (higher value, lower margin).`,
-    "WellnessCorp renewal approaching (5 months) - NPS 55 suggests stable but room for improvement. Begin renewal discussions now with focus on expanding scope.",
+    `Weighted pipeline value ($${(weightedPipelineValue / 1000000).toFixed(1)}M) represents realistic expected revenue based on stage probabilities. Focus on moving negotiation stage deals (avg 70% prob) to close.`,
   ]
 
   return (
@@ -138,7 +138,7 @@ export default function PartnershipsPage() {
                   step="10000"
                   value={dealValue}
                   onChange={(e) => setDealValue(Number(e.target.value))}
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                  className="w-full h-2 bg-gradient-to-r from-accent/20 to-accent/20 rounded-full appearance-none cursor-grab active:cursor-grabbing border border-border [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:hover:scale-110 [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:active:cursor-grabbing"
                 />
               </div>
 
@@ -156,7 +156,7 @@ export default function PartnershipsPage() {
                   step="0.5"
                   value={commissionRate}
                   onChange={(e) => setCommissionRate(Number(e.target.value))}
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                  className="w-full h-2 bg-gradient-to-r from-accent/20 to-accent/20 rounded-full appearance-none cursor-grab active:cursor-grabbing border border-border [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:hover:scale-110 [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:active:cursor-grabbing"
                 />
               </div>
             </div>
