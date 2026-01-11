@@ -9,14 +9,6 @@ import { KpiDefinitionsDrawer } from "@/components/kpi-definitions-drawer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
   kpis,
   alerts,
   initiatives,
@@ -25,7 +17,7 @@ import {
   cashTrendData,
 } from "@/data/mock"
 import { KPI } from "@/data/types"
-import { Clock, AlertTriangle, TrendingUp } from "lucide-react"
+import { Clock, AlertTriangle, TrendingUp, Target, DollarSign, Flame } from "lucide-react"
 
 export default function OverviewPage() {
   const [selectedKpi, setSelectedKpi] = useState<KPI | null>(null)
@@ -42,21 +34,114 @@ export default function OverviewPage() {
     ].includes(kpi.name)
   )
 
-  // Get in-progress initiatives
-  const thisWeeksPriorities = initiatives
-    .filter((init) => init.status === "In Progress")
-    .slice(0, 5)
+  // Calculate priority metrics
+  const inProgressInitiatives = initiatives.filter((init) => init.status === "In Progress")
+  const avgImpactScore = inProgressInitiatives.length > 0
+    ? inProgressInitiatives.reduce((sum, init) => sum + init.impactScore, 0) / inProgressInitiatives.length
+    : 0
 
-  // Get high-impact risks
-  const risksToWatch = risks
-    .filter((risk) => risk.impact === "High" && risk.status !== "Mitigated")
-    .slice(0, 3)
+  // Calculate risk metrics
+  const highRisks = risks.filter((risk) => risk.impact === "High" && risk.status !== "Mitigated")
+  const criticalRisks = risks.filter((risk) =>
+    risk.impact === "High" && risk.likelihood === "High" && risk.status !== "Mitigated"
+  )
 
-  // Get top deals
-  const topDeals = deals
-    .filter((deal) => deal.stage !== "Closed Lost")
-    .sort((a, b) => b.value * b.probability - a.value * a.probability)
-    .slice(0, 5)
+  // Calculate pipeline metrics
+  const activeDeals = deals.filter((deal) => deal.stage !== "Closed Lost")
+  const totalPipelineValue = activeDeals.reduce((sum, deal) => sum + deal.value, 0)
+  const weightedPipelineValue = activeDeals.reduce(
+    (sum, deal) => sum + deal.value * (deal.probability / 100),
+    0
+  )
+  const topDeal = activeDeals.sort((a, b) => b.value * b.probability - a.value * a.probability)[0]
+
+  // Create operational KPIs
+  const operationalKpis: KPI[] = [
+    {
+      id: "op-initiatives",
+      name: "Active Initiatives",
+      value: inProgressInitiatives.length,
+      unit: "",
+      target: 5,
+      trendPct: 0,
+      status: inProgressInitiatives.length <= 5 ? "green" : "yellow",
+      owner: "Head of Operations",
+      definition: "Number of initiatives currently in progress",
+      formula: "Count of initiatives with status 'In Progress'",
+      source: "Operations Board",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-impact",
+      name: "Avg Impact Score",
+      value: avgImpactScore.toFixed(1),
+      unit: "/10",
+      target: 7,
+      trendPct: 5.2,
+      status: avgImpactScore >= 7 ? "green" : avgImpactScore >= 5 ? "yellow" : "red",
+      owner: "Head of Operations",
+      definition: "Average impact score of active initiatives",
+      formula: "Sum of impact scores / Number of initiatives",
+      source: "Operations Board",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-risks",
+      name: "High Impact Risks",
+      value: highRisks.length,
+      unit: "",
+      target: 0,
+      trendPct: 15.0,
+      status: highRisks.length === 0 ? "green" : highRisks.length <= 3 ? "yellow" : "red",
+      owner: "Head of Operations",
+      definition: "Number of high-impact risks requiring attention",
+      formula: "Count of risks with Impact = High and Status != Mitigated",
+      source: "Risk Register",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-critical-risks",
+      name: "Critical Risks",
+      value: criticalRisks.length,
+      unit: "",
+      target: 0,
+      trendPct: 50.0,
+      status: criticalRisks.length === 0 ? "green" : "red",
+      owner: "Head of Operations",
+      definition: "High likelihood + high impact risks",
+      formula: "Count where Likelihood = High AND Impact = High",
+      source: "Risk Register",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-pipeline",
+      name: "Total Pipeline",
+      value: totalPipelineValue,
+      unit: "$",
+      target: 1000000,
+      trendPct: 8.5,
+      status: totalPipelineValue >= 1000000 ? "green" : "yellow",
+      owner: "Head of Partnerships",
+      definition: "Total value of active partnership opportunities",
+      formula: "Sum of all active deal values",
+      source: "Partnership CRM",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-weighted-pipeline",
+      name: "Weighted Pipeline",
+      value: weightedPipelineValue,
+      unit: "$",
+      target: 500000,
+      trendPct: 12.3,
+      status: weightedPipelineValue >= 500000 ? "green" : "yellow",
+      owner: "Head of Partnerships",
+      definition: "Pipeline value adjusted by probability",
+      formula: "Sum of (Deal Value × Probability)",
+      source: "Partnership CRM",
+      updatedAt: "2026-01-09",
+    },
+  ]
 
   const insights = [
     "Runway dropped to 8.4 months - immediate burn reduction required to extend to 12+ months",
@@ -88,9 +173,18 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* Charts and Lists Row */}
+      {/* Operational Metrics */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Operational Snapshot</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {operationalKpis.map((kpi) => (
+            <KpiCard key={kpi.id} kpi={kpi} onInfoClick={setSelectedKpi} />
+          ))}
+        </div>
+      </div>
+
+      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Cash & Runway Trend */}
         <TrendChart
           title="Cash Balance Trend"
           data={cashTrendData}
@@ -99,119 +193,78 @@ export default function OverviewPage() {
           formatValue={(value) => `$${(value / 1000).toFixed(0)}k`}
         />
 
-        {/* This Week's Priorities */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              This Week's Priorities
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {thisWeeksPriorities.map((initiative) => (
-                <div
-                  key={initiative.id}
-                  className="flex items-start justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">{initiative.title}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {initiative.owner} • {initiative.team}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className="text-xs whitespace-nowrap"
-                    >
-                      Impact: {initiative.impactScore}/10
+        {/* Top Initiative & Risk Highlights */}
+        <div className="grid grid-cols-1 gap-4">
+          {/* Top Priority Card */}
+          {inProgressInitiatives[0] && (
+            <Card className="border-accent/40">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-accent" />
+                  <CardTitle className="text-base">Top Priority This Week</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="font-semibold mb-1">{inProgressInitiatives[0].title}</p>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>{inProgressInitiatives[0].owner}</span>
+                  <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
+                    Impact: {inProgressInitiatives[0].impactScore}/10
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Top Risk Card */}
+          {highRisks[0] && (
+            <Card className="border-red-200 bg-red-50/50">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                  <CardTitle className="text-base">Top Risk</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="font-semibold mb-1 text-red-900">{highRisks[0].title}</p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-red-700">{highRisks[0].owner}</span>
+                  <div className="flex gap-1">
+                    <Badge variant="outline" className="text-xs bg-red-100 text-red-700 border-red-200">
+                      {highRisks[0].likelihood}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs bg-red-100 text-red-700 border-red-200">
+                      {highRisks[0].impact}
                     </Badge>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+              </CardContent>
+            </Card>
+          )}
 
-      {/* Risks and Pipeline Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Risks to Watch */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              Risks to Watch
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {risksToWatch.map((risk) => (
-                <div
-                  key={risk.id}
-                  className="p-3 rounded-lg border border-red-200 bg-red-50"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <p className="font-medium text-sm">{risk.title}</p>
-                    <div className="flex gap-1">
-                      <Badge variant="outline" className="text-xs">
-                        {risk.likelihood}
-                      </Badge>
-                      <Badge variant="red" className="text-xs">
-                        {risk.impact}
-                      </Badge>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Owner: {risk.owner} • Next Review:{" "}
-                    {new Date(risk.nextReviewDate).toLocaleDateString()}
-                  </p>
+          {/* Top Deal Card */}
+          {topDeal && (
+            <Card className="border-green-200 bg-green-50/50">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-green-600" />
+                  <CardTitle className="text-base">Top Pipeline Opportunity</CardTitle>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Pipeline Snapshot */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Pipeline Snapshot
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Partner</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Prob</TableHead>
-                  <TableHead>Stage</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {topDeals.map((deal) => (
-                  <TableRow key={deal.id}>
-                    <TableCell className="font-medium text-sm">
-                      {deal.partnerName}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      ${(deal.value / 1000).toFixed(0)}k
-                    </TableCell>
-                    <TableCell className="text-sm">{deal.probability}%</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs">
-                        {deal.stage}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+              </CardHeader>
+              <CardContent>
+                <p className="font-semibold mb-1 text-green-900">{topDeal.partnerName}</p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-green-700">
+                    ${(topDeal.value / 1000).toFixed(0)}k • {topDeal.probability}% prob
+                  </span>
+                  <Badge variant="outline" className="text-xs bg-green-100 text-green-700 border-green-200">
+                    {topDeal.stage}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
 
       {/* Insights Panel */}
