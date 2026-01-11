@@ -21,29 +21,80 @@ import { AlertTriangle, Target, Zap, CheckCircle2 } from "lucide-react"
 export default function OperationsPage() {
   const [selectedKpi, setSelectedKpi] = useState<KPI | null>(null)
 
-  const opsKpis = kpis.filter((kpi) =>
-    ["Response Time", "CSAT"].includes(kpi.name)
-  )
-
-  // Mock additional ops KPIs
-  const additionalOpsKpis = [
+  // Operational KPIs matching Overview operational metrics
+  const operationalKpis: KPI[] = [
     {
-      id: "ops-refunds",
-      name: "Refund Rate",
-      value: 1.8,
+      id: "op-forecast-accuracy",
+      name: "Forecast Accuracy",
+      value: 92.5,
       unit: "%",
-      target: 2.0,
-      trendPct: -5.2,
-      status: "green" as const,
-      owner: "Head of Operations",
-      definition: "Percentage of transactions resulting in refunds",
-      formula: "Refunds / Total Transactions",
-      source: "Payment System",
+      target: 95,
+      trendPct: 3.2,
+      status: "yellow",
+      owner: "Finance Planning",
+      definition: "Accuracy of financial projections vs actuals",
+      formula: "100 - (|Forecasted - Actual| / Actual × 100)",
+      source: "Finance System",
       updatedAt: "2026-01-09",
     },
+    {
+      id: "op-pipeline-coverage",
+      name: "Pipeline Coverage",
+      value: 2.3,
+      unit: "x",
+      target: 3.0,
+      trendPct: 8.5,
+      status: "yellow",
+      owner: "Commercial Engine",
+      definition: "Pipeline value as multiple of quarterly target",
+      formula: "Total Pipeline Value / Quarterly Revenue Target",
+      source: "Partnership CRM",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-nps",
+      name: "NPS",
+      value: 42,
+      unit: "",
+      target: 50,
+      trendPct: 5.0,
+      status: "yellow",
+      owner: "Customer Voice",
+      definition: "Net Promoter Score - customer satisfaction metric",
+      formula: "% Promoters (9-10) - % Detractors (0-6)",
+      source: "Survey Tool",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-enps",
+      name: "eNPS",
+      value: 38,
+      unit: "",
+      target: 40,
+      trendPct: 2.7,
+      status: "green",
+      owner: "People Health",
+      definition: "Employee Net Promoter Score - team satisfaction",
+      formula: "% Promoters (9-10) - % Detractors (0-6)",
+      source: "Employee Survey",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-sla-resolution",
+      name: "SLA Resolution Time",
+      value: 2.4,
+      unit: "hours",
+      target: 2.0,
+      trendPct: 8.5,
+      status: "yellow",
+      owner: "Service Performance",
+      definition: "Average time to resolve customer support tickets",
+      formula: "Sum of Resolution Times / Total Resolved Tickets",
+      source: "Support System",
+      updatedAt: "2026-01-09",
+      inverse: true,
+    },
   ]
-
-  const allOpsKpis = [...opsKpis, ...additionalOpsKpis]
 
   const priorityColors = {
     critical: "bg-red-100 text-red-800 border-red-200",
@@ -68,11 +119,11 @@ export default function OperationsPage() {
   }
 
   const insights = [
-    "Support response time degraded to 2.4hrs (target: 2.0hrs) due to 40% increase in ticket volume",
-    "Lab processing delays affecting 15% of orders - critical bottleneck requiring immediate attention",
-    "Customer onboarding time-to-value of 14 days causing early churn - self-serve improvements needed",
-    "5 initiatives in progress across teams - 2 are high-impact (score 9/10) and on track",
-    "CSAT remains strong at 4.6/5 despite operational challenges - team executing well",
+    "SLA Resolution Time at 2.4hrs (target: 2.0hrs) due to 40% increase in support ticket volume - hiring plan in progress",
+    "Lab processing is critical bottleneck (48hr SLA missed 15% of time) - backup vendor contract pending signature by 2026-01-14",
+    "Forecast Accuracy at 92.5% vs 95% target - need tighter alignment between sales pipeline and finance projections",
+    "NPS at 42 (target: 50) and eNPS at 38 (target: 40) - customer and employee satisfaction need focus",
+    "Pipeline Coverage at 2.3x vs 3.0x target - commercial engine needs more top-of-funnel activity to hit quarterly goals",
   ]
 
   return (
@@ -87,8 +138,8 @@ export default function OperationsPage() {
       {/* Operations KPIs */}
       <div>
         <h2 className="text-xl font-semibold mb-4">Operations Metrics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {allOpsKpis.map((kpi) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {operationalKpis.map((kpi) => (
             <KpiCard key={kpi.id} kpi={kpi} onInfoClick={setSelectedKpi} />
           ))}
         </div>
@@ -147,6 +198,32 @@ export default function OperationsPage() {
                       Fix Owner:{" "}
                     </span>
                     <span>{bottleneck.fixOwner}</span>
+                  </div>
+                  <div className="pt-2 mt-2 border-t border-border">
+                    <span className="font-medium text-muted-foreground">
+                      Next Steps:{" "}
+                    </span>
+                    <span>{bottleneck.nextSteps}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-muted-foreground">
+                      Follow-up Date:{" "}
+                    </span>
+                    <span className="font-medium">
+                      {new Date(bottleneck.followUpDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-muted-foreground">
+                      Pending Deliverables:{" "}
+                    </span>
+                    <ul className="list-disc list-inside mt-1 ml-2">
+                      {bottleneck.pendingDeliverables.map((deliverable, idx) => (
+                        <li key={idx} className="text-muted-foreground">
+                          {deliverable}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </div>

@@ -683,6 +683,9 @@ export const bottlenecks: Bottleneck[] = [
     fixOwner: "Product Team",
     priority: "high",
     status: "fixing",
+    nextSteps: "Launch self-serve onboarding wizard and automated email sequence",
+    followUpDate: "2026-01-17",
+    pendingDeliverables: ["Onboarding wizard UI", "Email automation templates", "Help center integration"],
   },
   {
     id: "bottle-2",
@@ -692,6 +695,9 @@ export const bottlenecks: Bottleneck[] = [
     fixOwner: "Head of Operations",
     priority: "high",
     status: "analyzing",
+    nextSteps: "Complete hiring plan approval and post 2 support engineer roles",
+    followUpDate: "2026-01-15",
+    pendingDeliverables: ["Hiring budget approval", "Job descriptions", "AI chatbot evaluation report"],
   },
   {
     id: "bottle-3",
@@ -701,6 +707,9 @@ export const bottlenecks: Bottleneck[] = [
     fixOwner: "Operations Manager",
     priority: "critical",
     status: "fixing",
+    nextSteps: "Sign backup lab vendor and implement new sample routing logic",
+    followUpDate: "2026-01-14",
+    pendingDeliverables: ["Vendor contract signed", "Routing algorithm deployed", "Staff training completed"],
   },
   {
     id: "bottle-4",
@@ -710,6 +719,9 @@ export const bottlenecks: Bottleneck[] = [
     fixOwner: "General Counsel",
     priority: "medium",
     status: "identified",
+    nextSteps: "Hire fractional legal counsel and finalize updated contract templates",
+    followUpDate: "2026-01-20",
+    pendingDeliverables: ["Contractor agreement", "Updated partnership agreement template", "Redlines playbook"],
   },
 ]
 

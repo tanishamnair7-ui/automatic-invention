@@ -192,6 +192,9 @@ export const BottleneckSchema = z.object({
   fixOwner: z.string(),
   priority: z.enum(["low", "medium", "high", "critical"]),
   status: z.enum(["identified", "analyzing", "fixing", "resolved"]),
+  nextSteps: z.string(),
+  followUpDate: z.string(),
+  pendingDeliverables: z.array(z.string()),
 })
 
 export type Bottleneck = z.infer<typeof BottleneckSchema>
