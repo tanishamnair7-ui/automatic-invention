@@ -13,14 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { deals } from "@/data/mock"
-import { Calculator, FileText, TrendingUp } from "lucide-react"
+import { deals, partnershipContracts } from "@/data/mock"
+import { Calculator, FileText, AlertTriangle } from "lucide-react"
 
 export default function PartnershipsPage() {
   const [dealValue, setDealValue] = useState(250000)
-  const [probability, setProbability] = useState(70)
+  const [commissionRate, setCommissionRate] = useState(10)
 
-  const expectedValue = (dealValue * probability) / 100
+  const commissionAmount = (dealValue * commissionRate) / 100
 
   // Calculate pipeline metrics
   const totalPipelineValue = deals.reduce((sum, deal) => sum + deal.value, 0)
@@ -30,45 +30,18 @@ export default function PartnershipsPage() {
   )
   const avgDealSize = totalPipelineValue / deals.length
 
-  // Group deals by stage for summary
-  const dealsByStage = deals.reduce(
-    (acc, deal) => {
-      if (!acc[deal.stage]) acc[deal.stage] = []
-      acc[deal.stage].push(deal)
-      return acc
-    },
-    {} as Record<string, typeof deals>
-  )
-
-  // Contract renewals (mock data)
-  const contracts = [
-    {
-      id: "c1",
-      partner: "Mindful Clinics",
-      type: "Co-Marketing",
-      value: 75000,
-      startDate: "2026-01-05",
-      renewalDate: "2027-01-05",
-      obligations: "Joint campaign quarterly, co-branded content monthly",
-    },
-    {
-      id: "c2",
-      partner: "Previous Partner A",
-      type: "Distribution",
-      value: 120000,
-      startDate: "2025-06-01",
-      renewalDate: "2026-06-01",
-      obligations: "Revenue share 15%, quarterly business reviews",
-    },
-  ]
+  // Calculate NPS metrics
+  const avgPartnerNps = partnershipContracts.reduce((sum, c) => sum + c.nps, 0) / partnershipContracts.length
+  const lowNpsPartners = partnershipContracts.filter(c => c.nps < 35)
+  const atRiskValue = lowNpsPartners.reduce((sum, c) => sum + c.value, 0)
 
   const insights = [
-    "Pipeline value totals $1.1M with $537k weighted by probability",
-    "WellnessCorp deal (70% prob, $250k) is critical - board intro could accelerate close",
-    "FitLife Insurance opportunity ($500k) requires executive sponsorship - long sales cycle",
-    "Successfully closed Mindful Clinics co-marketing deal - campaign launches Feb 1",
-    "Need to increase top-of-funnel - only 1 deal in prospecting stage",
-    "Contract with Previous Partner A renewing in 5 months - start renewal discussion now",
+    `Partnership pipeline: $${(totalPipelineValue / 1000).toFixed(0)}k total value, $${(weightedPipelineValue / 1000).toFixed(0)}k weighted. WellnessCorp ($250k, 70% prob) is largest opportunity - board intro could accelerate close.`,
+    `Active contracts worth $${(partnershipContracts.reduce((sum, c) => sum + c.value, 0) / 1000).toFixed(0)}k with avg NPS of ${avgPartnerNps.toFixed(0)}. Critical issues: HealthTech Solutions (NPS 28) and Fitness Network Global (NPS 18) require immediate attention.`,
+    `$${(atRiskValue / 1000).toFixed(0)}k in contract value at risk from low NPS partners (<35). Pattern: overdue contacts (HealthTech: 24 days, Fitness Network: 37 days). Schedule executive QBRs immediately.`,
+    "Stage conversion analysis: Only 1 deal in Prospecting - need to increase top-of-funnel. 3 deals in Proposal/Negotiation stages suggest strong conversion momentum.",
+    `Commission structure: At 10% rate on avg deal ($${(avgDealSize / 1000).toFixed(0)}k), expect $${(avgDealSize * 0.10 / 1000).toFixed(0)}k per closed deal. Review rates for strategic partnerships (higher value, lower margin).`,
+    "WellnessCorp renewal approaching (5 months) - NPS 55 suggests stable but room for improvement. Begin renewal discussions now with focus on expanding scope.",
   ]
 
   return (
@@ -137,13 +110,16 @@ export default function PartnershipsPage() {
         <Kanban deals={deals} />
       </div>
 
-      {/* Deal Model Calculator */}
+      {/* Commission Calculator */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calculator className="h-5 w-5" />
-            Deal Model Calculator
+            Commission Calculator
           </CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">
+            Calculate partner commissions or referral fees based on deal value
+          </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
@@ -168,18 +144,18 @@ export default function PartnershipsPage() {
 
               <div>
                 <label className="text-sm text-muted-foreground flex justify-between mb-2">
-                  <span>Probability (%)</span>
+                  <span>Commission Rate (%)</span>
                   <span className="font-medium text-foreground">
-                    {probability}%
+                    {commissionRate}%
                   </span>
                 </label>
                 <input
                   type="range"
                   min="0"
-                  max="100"
-                  step="5"
-                  value={probability}
-                  onChange={(e) => setProbability(Number(e.target.value))}
+                  max="25"
+                  step="0.5"
+                  value={commissionRate}
+                  onChange={(e) => setCommissionRate(Number(e.target.value))}
                   className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
@@ -187,15 +163,29 @@ export default function PartnershipsPage() {
 
             <div className="bg-accent-2/20 rounded-xl p-6 border border-accent/20">
               <p className="text-sm text-muted-foreground mb-2">
-                Expected Value
+                Commission Amount
               </p>
               <p className="text-4xl font-bold text-accent">
-                ${expectedValue.toLocaleString()}
+                ${commissionAmount.toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground mt-2">
-                Formula: Deal Value × Probability = ${dealValue.toLocaleString()} ×{" "}
-                {probability}% = ${expectedValue.toLocaleString()}
+                Formula: Deal Value × Commission Rate = ${dealValue.toLocaleString()} × {commissionRate}% = ${commissionAmount.toLocaleString()}
               </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 text-sm">
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-muted-foreground mb-1">At 5% rate</p>
+                <p className="font-semibold">${(dealValue * 0.05).toLocaleString()}</p>
+              </div>
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-muted-foreground mb-1">At 10% rate</p>
+                <p className="font-semibold">${(dealValue * 0.10).toLocaleString()}</p>
+              </div>
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-muted-foreground mb-1">At 15% rate</p>
+                <p className="font-semibold">${(dealValue * 0.15).toLocaleString()}</p>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -208,59 +198,99 @@ export default function PartnershipsPage() {
             <FileText className="h-5 w-5" />
             Active Contracts & Renewals
           </CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">
+            {partnershipContracts.length} active partnerships worth ${(partnershipContracts.reduce((sum, c) => sum + c.value, 0) / 1000).toFixed(0)}k annually
+          </p>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Partner</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Annual Value</TableHead>
-                <TableHead>Start Date</TableHead>
-                <TableHead>Renewal Date</TableHead>
-                <TableHead>Key Obligations</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {contracts.map((contract) => {
-                const monthsToRenewal = Math.ceil(
-                  (new Date(contract.renewalDate).getTime() - new Date().getTime()) /
-                    (1000 * 60 * 60 * 24 * 30)
-                )
-                const isRenewalSoon = monthsToRenewal <= 6
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Partner</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Annual Value</TableHead>
+                  <TableHead>Renewal Date</TableHead>
+                  <TableHead>NPS</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Key Obligations</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {partnershipContracts
+                  .sort((a, b) => new Date(a.renewalDate).getTime() - new Date(b.renewalDate).getTime())
+                  .map((contract) => {
+                    const monthsToRenewal = Math.ceil(
+                      (new Date(contract.renewalDate).getTime() - new Date().getTime()) /
+                        (1000 * 60 * 60 * 24 * 30)
+                    )
+                    const isRenewalSoon = monthsToRenewal <= 6
+                    const daysSinceContact = Math.floor(
+                      (new Date().getTime() - new Date(contract.lastContact).getTime()) /
+                        (1000 * 60 * 60 * 24)
+                    )
+                    const needsContact = contract.nps < 35 || daysSinceContact > 14
 
-                return (
-                  <TableRow key={contract.id}>
-                    <TableCell className="font-medium">
-                      {contract.partner}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{contract.type}</Badge>
-                    </TableCell>
-                    <TableCell>${contract.value.toLocaleString()}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {new Date(contract.startDate).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">
-                          {new Date(contract.renewalDate).toLocaleDateString()}
-                        </span>
-                        {isRenewalSoon && (
-                          <Badge variant="yellow" className="text-xs">
-                            {monthsToRenewal}mo
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground max-w-xs">
-                      {contract.obligations}
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+                    return (
+                      <TableRow key={contract.id}>
+                        <TableCell className="font-medium">
+                          {contract.partner}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{contract.type}</Badge>
+                        </TableCell>
+                        <TableCell>${(contract.value / 1000).toFixed(0)}k</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">
+                              {new Date(contract.renewalDate).toLocaleDateString()}
+                            </span>
+                            {isRenewalSoon && (
+                              <Badge variant="outline" className="text-xs bg-yellow-50">
+                                {monthsToRenewal}mo
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              variant="outline"
+                              className={`text-xs ${
+                                contract.nps >= 50
+                                  ? "bg-green-50 text-green-700"
+                                  : contract.nps >= 35
+                                  ? "bg-yellow-50 text-yellow-700"
+                                  : "bg-red-50 text-red-700"
+                              }`}
+                            >
+                              {contract.nps}
+                            </Badge>
+                            {needsContact && (
+                              <Badge variant="destructive" className="text-xs">
+                                <AlertTriangle className="h-3 w-3 mr-1" />
+                                Contact Now
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          <div>
+                            <p className="font-medium">{contract.primaryContact}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Last: {daysSinceContact} days ago
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground max-w-xs">
+                          {contract.obligations}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

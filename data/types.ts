@@ -55,6 +55,22 @@ export const DealSchema = z.object({
 
 export type Deal = z.infer<typeof DealSchema>
 
+// Partnership Contract Schema and Type
+export const PartnershipContractSchema = z.object({
+  id: z.string(),
+  partner: z.string(),
+  type: z.string(),
+  value: z.number(),
+  startDate: z.string(),
+  renewalDate: z.string(),
+  obligations: z.string(),
+  nps: z.number(),
+  lastContact: z.string(),
+  primaryContact: z.string(),
+})
+
+export type PartnershipContract = z.infer<typeof PartnershipContractSchema>
+
 // Vendor Schema and Type
 export const VendorSchema = z.object({
   id: z.string(),

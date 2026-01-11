@@ -40,10 +40,15 @@ export function Kanban({ deals: initialDeals }: KanbanProps) {
       <div className="flex gap-4 min-w-max">
         {stages.map((stage) => {
           const stageDeals = getDealsByStage(stage)
-          const stageValue = stageDeals.reduce(
+          const totalValue = stageDeals.reduce((sum, deal) => sum + deal.value, 0)
+          const weightedValue = stageDeals.reduce(
             (sum, deal) => sum + deal.value * (deal.probability / 100),
             0
           )
+          const avgDealAmount = stageDeals.length > 0 ? totalValue / stageDeals.length : 0
+          const avgProbability = stageDeals.length > 0
+            ? stageDeals.reduce((sum, deal) => sum + deal.probability, 0) / stageDeals.length
+            : 0
 
           return (
             <div key={stage} className="w-80 flex-shrink-0">
@@ -51,15 +56,30 @@ export function Kanban({ deals: initialDeals }: KanbanProps) {
                 className={`rounded-xl border-2 ${stageColors[stage]} p-4 h-full`}
               >
                 <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold">{stage}</h3>
                     <Badge variant="outline" className="text-xs">
-                      {stageDeals.length}
+                      {stageDeals.length} {stageDeals.length === 1 ? "deal" : "deals"}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Expected: ${stageValue.toLocaleString()}
-                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <p className="text-muted-foreground">Total Value</p>
+                      <p className="font-semibold">${(totalValue / 1000).toFixed(0)}k</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Weighted</p>
+                      <p className="font-semibold">${(weightedValue / 1000).toFixed(0)}k</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Avg Deal</p>
+                      <p className="font-semibold">${(avgDealAmount / 1000).toFixed(0)}k</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Avg Prob</p>
+                      <p className="font-semibold">{avgProbability.toFixed(0)}%</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
