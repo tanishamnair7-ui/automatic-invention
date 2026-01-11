@@ -40,7 +40,7 @@ export default function BoardPackPage() {
     [
       "Cash Balance",
       "Runway",
-      "Monthly Burn Rate",
+      "Monthly Burn",
       "MRR",
       "ARR",
       "Churn Rate",

@@ -31,7 +31,7 @@ export default function FinancePage() {
   const [selectedKpi, setSelectedKpi] = useState<KPI | null>(null)
 
   const financeKpis = kpis.filter((kpi) =>
-    ["Cash Balance", "Monthly Burn Rate", "Runway"].includes(kpi.name)
+    ["Cash Balance", "Monthly Burn", "Runway"].includes(kpi.name)
   )
 
   const insights = [
@@ -77,7 +77,7 @@ export default function FinancePage() {
           formatValue={(value) => `$${(value / 1000).toFixed(0)}k`}
         />
         <TrendChart
-          title="Monthly Burn Rate"
+          title="Monthly Burn"
           data={burnTrendData}
           type="bar"
           color="#D45A3E"

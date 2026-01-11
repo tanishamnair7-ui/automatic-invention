@@ -36,7 +36,7 @@ export const kpis: KPI[] = [
   },
   {
     id: "kpi-2",
-    name: "Monthly Burn Rate",
+    name: "Monthly Burn",
     value: 285000,
     unit: "$",
     target: 250000,
@@ -58,7 +58,7 @@ export const kpis: KPI[] = [
     status: "red",
     owner: "CFO",
     definition: "Months until cash runs out at current burn",
-    formula: "Cash Balance / Monthly Burn Rate",
+    formula: "Cash Balance / Monthly Burn",
     source: "Calculated",
     updatedAt: "2026-01-09",
   },

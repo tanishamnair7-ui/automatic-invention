@@ -31,7 +31,7 @@ export default function OverviewPage() {
     [
       "Cash Balance",
       "Runway",
-      "Monthly Burn Rate",
+      "Monthly Burn",
       "MRR",
       "Churn Rate",
       "Response Time",
@@ -230,7 +230,7 @@ export default function OverviewPage() {
     },
     {
       id: "burn",
-      name: "Monthly Burn Rate",
+      name: "Monthly Burn",
       data: burnTrendData,
       color: "#F4C7B8",
       formatValue: (value: number) => `$${(value / 1000).toFixed(0)}k`,
