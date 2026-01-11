@@ -1,8 +1,7 @@
 "use client"
 
-import { ArrowDown, ArrowUp, Info } from "lucide-react"
+import { ArrowDown, ArrowUp, Info, CheckCircle, AlertCircle, XCircle } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { KPI } from "@/data/types"
 import { cn } from "@/lib/utils"
 
@@ -28,11 +27,27 @@ export function KpiCard({ kpi, onInfoClick }: KpiCardProps) {
     return value
   }
 
-  const statusColors = {
-    green: "bg-green-50 text-green-700 border-green-200",
-    yellow: "bg-yellow-50 text-yellow-700 border-yellow-200",
-    red: "bg-red-50 text-red-700 border-red-200",
+  // Status icon configuration
+  const statusConfig = {
+    green: {
+      icon: CheckCircle,
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+    },
+    yellow: {
+      icon: AlertCircle,
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-50",
+    },
+    red: {
+      icon: XCircle,
+      color: "text-red-600",
+      bgColor: "bg-red-50",
+    },
   }
+
+  const config = statusConfig[kpi.status]
+  const StatusIcon = config.icon
 
   const trendColor = kpi.trendPct >= 0 ? "text-green-600" : "text-red-600"
   const TrendIcon = kpi.trendPct >= 0 ? ArrowUp : ArrowDown
@@ -57,12 +72,9 @@ export function KpiCard({ kpi, onInfoClick }: KpiCardProps) {
               )}
             </div>
           </div>
-          <Badge
-            variant={kpi.status === "green" ? "green" : kpi.status === "yellow" ? "yellow" : "red"}
-            className={cn("text-xs", statusColors[kpi.status])}
-          >
-            {kpi.status}
-          </Badge>
+          <div className={cn("rounded-full p-1.5", config.bgColor)}>
+            <StatusIcon className={cn("h-4 w-4", config.color)} />
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -76,7 +88,7 @@ export function KpiCard({ kpi, onInfoClick }: KpiCardProps) {
             </span>
             <div className={cn("flex items-center gap-1 font-medium", trendColor)}>
               <TrendIcon className="h-4 w-4" />
-              <span>{Math.abs(kpi.trendPct).toFixed(1)}%</span>
+              <span>{Math.abs(kpi.trendPct).toFixed(1)}% vs PM</span>
             </div>
           </div>
         </div>

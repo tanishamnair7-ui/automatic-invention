@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { KpiCard } from "@/components/kpi-card"
-import { TrendChart } from "@/components/trend-chart"
+import { SwitchableChart } from "@/components/switchable-chart"
 import { HighsAndLows } from "@/components/highs-and-lows"
 import { InsightsPanel } from "@/components/insights-panel"
 import { KpiDefinitionsDrawer } from "@/components/kpi-definitions-drawer"
@@ -15,8 +15,11 @@ import {
   risks,
   deals,
   cashTrendData,
+  mrrTrendData,
+  churnTrendData,
+  burnTrendData,
 } from "@/data/mock"
-import { KPI } from "@/data/types"
+import { KPI, TrendData } from "@/data/types"
 import { Target, DollarSign, AlertTriangle } from "lucide-react"
 
 export default function OverviewPage() {
@@ -37,9 +40,6 @@ export default function OverviewPage() {
 
   // Calculate priority metrics
   const inProgressInitiatives = initiatives.filter((init) => init.status === "In Progress")
-  const avgImpactScore = inProgressInitiatives.length > 0
-    ? inProgressInitiatives.reduce((sum, init) => sum + init.impactScore, 0) / inProgressInitiatives.length
-    : 0
 
   // Calculate risk metrics
   const highRisks = risks.filter((risk) => risk.impact === "High" && risk.status !== "Mitigated")
@@ -56,90 +56,76 @@ export default function OverviewPage() {
   )
   const topDeal = activeDeals.sort((a, b) => b.value * b.probability - a.value * a.probability)[0]
 
-  // Create operational KPIs
+  // Create operational KPIs with new metrics
   const operationalKpis: KPI[] = [
     {
-      id: "op-initiatives",
-      name: "Active Initiatives",
-      value: inProgressInitiatives.length,
-      unit: "",
-      target: 5,
-      trendPct: 0,
-      status: inProgressInitiatives.length <= 5 ? "green" : "yellow",
-      owner: "Head of Operations",
-      definition: "Number of initiatives currently in progress",
-      formula: "Count of initiatives with status 'In Progress'",
-      source: "Operations Board",
+      id: "op-forecast-accuracy",
+      name: "Forecast Accuracy",
+      value: 92.5,
+      unit: "%",
+      target: 95,
+      trendPct: 3.2,
+      status: "yellow",
+      owner: "Finance Planning",
+      definition: "Accuracy of financial projections vs actuals",
+      formula: "100 - (|Forecasted - Actual| / Actual × 100)",
+      source: "Finance System",
       updatedAt: "2026-01-09",
     },
     {
-      id: "op-impact",
-      name: "Avg Impact Score",
-      value: avgImpactScore.toFixed(1),
-      unit: "/10",
-      target: 7,
-      trendPct: 5.2,
-      status: avgImpactScore >= 7 ? "green" : avgImpactScore >= 5 ? "yellow" : "red",
-      owner: "Head of Operations",
-      definition: "Average impact score of active initiatives",
-      formula: "Sum of impact scores / Number of initiatives",
-      source: "Operations Board",
-      updatedAt: "2026-01-09",
-    },
-    {
-      id: "op-risks",
-      name: "High Impact Risks",
-      value: highRisks.length,
-      unit: "",
-      target: 0,
-      trendPct: 15.0,
-      status: highRisks.length === 0 ? "green" : highRisks.length <= 3 ? "yellow" : "red",
-      owner: "Head of Operations",
-      definition: "Number of high-impact risks requiring attention",
-      formula: "Count of risks with Impact = High and Status != Mitigated",
-      source: "Risk Register",
-      updatedAt: "2026-01-09",
-    },
-    {
-      id: "op-critical-risks",
-      name: "Critical Risks",
-      value: criticalRisks.length,
-      unit: "",
-      target: 0,
-      trendPct: 50.0,
-      status: criticalRisks.length === 0 ? "green" : "red",
-      owner: "Head of Operations",
-      definition: "High likelihood + high impact risks",
-      formula: "Count where Likelihood = High AND Impact = High",
-      source: "Risk Register",
-      updatedAt: "2026-01-09",
-    },
-    {
-      id: "op-pipeline",
-      name: "Total Pipeline",
-      value: totalPipelineValue,
-      unit: "$",
-      target: 1000000,
+      id: "op-pipeline-coverage",
+      name: "Pipeline Coverage",
+      value: 2.3,
+      unit: "x",
+      target: 3.0,
       trendPct: 8.5,
-      status: totalPipelineValue >= 1000000 ? "green" : "yellow",
-      owner: "Head of Partnerships",
-      definition: "Total value of active partnership opportunities",
-      formula: "Sum of all active deal values",
+      status: "yellow",
+      owner: "Commercial Engine",
+      definition: "Pipeline value as multiple of quarterly target",
+      formula: "Total Pipeline Value / Quarterly Revenue Target",
       source: "Partnership CRM",
       updatedAt: "2026-01-09",
     },
     {
-      id: "op-weighted-pipeline",
-      name: "Weighted Pipeline",
-      value: weightedPipelineValue,
-      unit: "$",
-      target: 500000,
-      trendPct: 12.3,
-      status: weightedPipelineValue >= 500000 ? "green" : "yellow",
-      owner: "Head of Partnerships",
-      definition: "Pipeline value adjusted by probability",
-      formula: "Sum of (Deal Value × Probability)",
-      source: "Partnership CRM",
+      id: "op-nps",
+      name: "NPS",
+      value: 42,
+      unit: "",
+      target: 50,
+      trendPct: 5.0,
+      status: "yellow",
+      owner: "Customer Voice",
+      definition: "Net Promoter Score - customer satisfaction metric",
+      formula: "% Promoters (9-10) - % Detractors (0-6)",
+      source: "Survey Tool",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-enps",
+      name: "eNPS",
+      value: 38,
+      unit: "",
+      target: 40,
+      trendPct: 2.7,
+      status: "green",
+      owner: "People Health",
+      definition: "Employee Net Promoter Score - team satisfaction",
+      formula: "% Promoters (9-10) - % Detractors (0-6)",
+      source: "Employee Survey",
+      updatedAt: "2026-01-09",
+    },
+    {
+      id: "op-sla-resolution",
+      name: "SLA Resolution Time",
+      value: 2.4,
+      unit: "hours",
+      target: 2.0,
+      trendPct: 8.5,
+      status: "yellow",
+      owner: "Service Performance",
+      definition: "Average time to resolve customer support tickets",
+      formula: "Sum of Resolution Times / Total Resolved Tickets",
+      source: "Support System",
       updatedAt: "2026-01-09",
     },
   ]
@@ -164,30 +150,30 @@ export default function OverviewPage() {
     },
     {
       id: "win-3",
-      title: "CSAT Score Improving",
-      message: "Customer satisfaction up to 4.6/5 despite operational challenges - team executing well.",
+      title: "eNPS Score Healthy",
+      message: "Employee satisfaction at 38 (on target) - team morale and retention strong despite growth pressure.",
       type: "win" as const,
     },
 
     // WATCH CLOSELY (Quadrant 2)
     {
       id: "watch-1",
-      title: "CAC Increasing",
-      message: "Customer Acquisition Cost up 14% to $285. Review marketing efficiency and channel performance.",
+      title: "NPS Below Target",
+      message: "Customer NPS at 42 vs 50 target - improving but needs continued focus on product experience.",
       type: "watch" as const,
     },
     {
       id: "watch-2",
-      title: "Response Time Degrading",
-      message: "Support response time at 2.4hrs vs 2.0hr target. Ticket volume up 40% - may need additional headcount.",
+      title: "Pipeline Coverage Gap",
+      message: "Pipeline at 2.3x quarterly target (need 3.0x) - accelerate partnership prospecting.",
       type: "watch" as const,
     },
 
     // MONITOR (Quadrant 3)
     {
       id: "monitor-1",
-      title: "Burn Rate Above Target",
-      message: "Monthly burn increased to $285k, 14% above target of $250k. Marketing overspend primary driver.",
+      title: "Forecast Accuracy Below Target",
+      message: "Financial forecast accuracy at 92.5% vs 95% target - refine projection models.",
       type: "concern" as const,
     },
     {
@@ -216,12 +202,61 @@ export default function OverviewPage() {
     },
   ]
 
+  // Prepare metrics for switchable chart
+  const runwayTrendData: TrendData[] = [
+    { date: "2025-07", value: 13.0, label: "Jul" },
+    { date: "2025-08", value: 12.1, label: "Aug" },
+    { date: "2025-09", value: 10.8, label: "Sep" },
+    { date: "2025-10", value: 9.6, label: "Oct" },
+    { date: "2025-11", value: 9.3, label: "Nov" },
+    { date: "2025-12", value: 8.9, label: "Dec" },
+    { date: "2026-01", value: 8.4, label: "Jan" },
+  ]
+
+  const chartMetrics = [
+    {
+      id: "cash",
+      name: "Cash Balance",
+      data: cashTrendData,
+      color: "#E56B4E",
+      formatValue: (value: number) => `$${(value / 1000).toFixed(0)}k`,
+    },
+    {
+      id: "runway",
+      name: "Runway (months)",
+      data: runwayTrendData,
+      color: "#D45A3E",
+      formatValue: (value: number) => `${value.toFixed(1)} mo`,
+    },
+    {
+      id: "burn",
+      name: "Monthly Burn Rate",
+      data: burnTrendData,
+      color: "#F4C7B8",
+      formatValue: (value: number) => `$${(value / 1000).toFixed(0)}k`,
+    },
+    {
+      id: "mrr",
+      name: "MRR",
+      data: mrrTrendData,
+      color: "#E56B4E",
+      formatValue: (value: number) => `$${(value / 1000).toFixed(0)}k`,
+    },
+    {
+      id: "churn",
+      name: "Churn Rate",
+      data: churnTrendData,
+      color: "#D45A3E",
+      formatValue: (value: number) => `${value.toFixed(1)}%`,
+    },
+  ]
+
   const insights = [
-    "Runway dropped to 8.4 months - immediate burn reduction required to extend to 12+ months",
-    "Churn spiked to 4.2% (40% above target) - retention program launching this week is critical",
-    "MRR growth remains strong at 8.3% - pricing changes showing positive impact",
-    "WellnessCorp partnership (70% prob, $250k value) in final negotiations - board intro may accelerate close",
-    "Lab vendor SLA breaches creating customer friction - backup vendor evaluation underway",
+    "Immediate focus on runway extension: 8.4 months is below threshold. 13-week cash forecast shows critical weeks ahead - burn reduction plan required.",
+    "Churn spike (127 accounts, 5.2%) demands urgent retention action: analyze NPS scores for churned cohort, prioritize renewal pipeline reviews, and accelerate retention program launch.",
+    "Commercial engine shows mixed signals: MRR growth strong at 8.3%, but pipeline coverage at 2.3x (need 3.0x). Accelerate partnership prospecting while maintaining deal quality.",
+    "Operational health improving but needs attention: eNPS healthy (38), but customer NPS at 42 vs 50 target. Service SLA at 2.4hrs trending up from 2.0hr target due to volume.",
+    "Financial planning accuracy at 92.5% needs improvement: forecast accuracy below 95% target suggests model refinement needed as business scales.",
   ]
 
   return (
@@ -246,10 +281,10 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* Operational Metrics */}
+      {/* Operational Snapshot */}
       <div>
         <h2 className="text-xl font-semibold mb-4">Operational Snapshot</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {operationalKpis.map((kpi) => (
             <KpiCard key={kpi.id} kpi={kpi} onInfoClick={setSelectedKpi} />
           ))}
@@ -258,13 +293,7 @@ export default function OverviewPage() {
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TrendChart
-          title="Cash Balance Trend"
-          data={cashTrendData}
-          type="area"
-          color="#E56B4E"
-          formatValue={(value) => `$${(value / 1000).toFixed(0)}k`}
-        />
+        <SwitchableChart metrics={chartMetrics} />
 
         {/* Top Initiative & Risk Highlights */}
         <div className="grid grid-cols-1 gap-4">
